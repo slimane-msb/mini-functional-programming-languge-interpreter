@@ -5,10 +5,10 @@
 
 %}
 
-%token PLUS STAR MINUS DIV MOD (*+ * - / mod*)
+%token PLUS STAR SUB DIV MOD (*+ * - / mod*)
 %token NEG NOT
 %token EQ  (* for equal*)
-%token EQEQ NQ LT LE GE GT  AND OR (* for equalequal notequal lessThan LessEqual ..  *)
+%token EQEQ NEQ LT LE GE GT  AND OR (* for equalequal notequal lessThan LessEqual ..  *)
 %token LPAR RPAR LBRAQ RBRAQ
 %token FUN LET REC IN IF THEN ELSE  
 %token ARROW BARROW
@@ -78,6 +78,8 @@ paramRec:
 %inline binop:
   | PLUS { Add }
   | STAR { Mul }
+  | SUB  { Sub }
+  | DIV  { Div }
 ;
 
 

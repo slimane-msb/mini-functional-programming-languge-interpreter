@@ -28,6 +28,17 @@ rule token = parse
   | number as n         { CST(int_of_string n) }
   | "+"                 { PLUS }
   | "*"                 { STAR }
+  | "-"                 { NEG  }
+  | "not "              { NOT  }
+  | "-"                 { SUB  } 
+  | "/"                 { DIV  }
+  | "mod"               { MOD  }
+  | "=="                { EQEQ }
+  | "!="                { NEQ  }
+  | "<"                 { LT   }
+  | "<="                { LE   }
+  | "&&"                { AND  }
+  | "||"                { OR   }
   | _                   { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
   | eof                 { EOF }
 
