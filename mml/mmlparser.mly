@@ -6,6 +6,7 @@
 %}
 
 %token PLUS STAR MINUS DIV MOD (*+ * - / mod*)
+%token NEG NOT
 %token EQ  (* for equal*)
 %token EQEQ NQ LT LE GE GT  AND OR (* for equalequal notequal lessThan LessEqual ..  *)
 %token LPAR RPAR
@@ -41,19 +42,28 @@ simple_expression:
   | n=CST             { Int(n) }
   | b=BOOL            { Bool(b) }
   | u=UNIT            { Unit }
-  | id=IDENT            { (*todo*) }
-  | se=se DOT id=IDENT { (*todo*)}
-  | id=IDENT EQ e=e PV se' { (*todo*)}
+  | id=IDENT            { Var(id) }
+  | se=simple_expression DOT id=IDENT { GetF(se,id)}
+  | id=IDENT EQ e=expression PV er=expression{ SetF(e,id,er)} (* je suis pas de l'ordre de e et er, id en tous cas doit etre au milieu*)
   | LPAR e=e RPAR { expression e }
 ;
 
 expression:
   | e=simple_expression { e }
   | e1=expression op=binop e2=expression { Bop(op, e1, e2) }
+  | up=unop e=expression {Uop(up,e)}
+  | 
 ;
 
 %inline binop:
   | PLUS { Add }
   | STAR { Mul }
 ;
+
+
+%inline unop:
+  | NEG { Neg}
+  | NOT { Not }
+;
+
 
