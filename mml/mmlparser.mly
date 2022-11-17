@@ -65,7 +65,7 @@ expression:
   | e1=expression PV e2=expression {Seq(e1,e2)}
 
    
-
+(*typ not string for the second argument of fun and fix *)
 
 ;
 
