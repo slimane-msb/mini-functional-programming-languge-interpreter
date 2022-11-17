@@ -34,20 +34,26 @@
 %%
 
 program:
-| (* à compléter *) code=expression EOF { {types=[]; code} }
+  | (* à compléter *) code=expression EOF { {types=[]; code} }
 ;
 
 simple_expression:
-| n=CST { Int(n) }
+  | n=CST             { Int(n) }
+  | b=BOOL            { Bool(b) }
+  | u=UNIT            { Unit }
+  | id=IDENT            { (*todo*) }
+  | se=se DOT id=IDENT { (*todo*)}
+  | id=IDENT EQ e=e PV se' { (*todo*)}
+  | LPAR e=e RPAR { expression e }
 ;
 
 expression:
-| e=simple_expression { e }
-| e1=expression op=binop e2=expression { Bop(op, e1, e2) }
+  | e=simple_expression { e }
+  | e1=expression op=binop e2=expression { Bop(op, e1, e2) }
 ;
 
 %inline binop:
-| PLUS { Add }
-| STAR { Mul }
+  | PLUS { Add }
+  | STAR { Mul }
 ;
 
