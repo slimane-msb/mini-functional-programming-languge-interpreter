@@ -46,23 +46,29 @@ simple_expression:
   | id=IDENT            { Var(id) }
   | LPAR e=expression RPAR { e }
   | e=simple_expression DOT x=IDENT { GetF(e,x)}
+  (*strct*)
   | LBRAQ x=IDENT EQ e=expression PV  e=simple_expression RBRAQ{ Strct (x,e)::LBRAQ e RBRAQ} 
-  | LBRAQ RBRAQ {[]} (* cas de base pour les strct*)
-  | LPAR e=expression RPAR { e } 
+  | LBRAQ RBRAQ {[]} (* cas de base pour les strct*) 
 ;
 
 expression:
   | e=simple_expression { e }
-  | e1=expression op=binop e2=expression { Bop(op, e1, e2) }
-  | up=unop e=expression {Uop(up,e)}
-  | e=expression se=simple_expression { App(e,se)}
-  | IF ef=expression THEN et=expression {If(ef,et,Unit)}
-  | IF ef=expression THEN et=expression ELSE el=expression {IF(ef,et,el)}
-  | FUN x=IDENT ARROW e=expression {Fun(x, Option, e)}
-  | LET f=IDENT  param=param EQ e1=expression IN e2=expression  {Let(f,param e1,e2)} (*let f (x1:t1) (x2:t2) = e1 in e2   devient Let(f,Fun(x1,t1,Fun(x2,t2,e1)),e2)*)
-  | LET REC f=IDENT arg=param DP t=IDENT EQ e1=expression IN e2=expression {Let(f,paramRec t e1,e2)} (* let rec f (x1:t1) (x2:t2) : t = e1 in e2 devient Let(f,Fix(f,Tfun(t1,t),Fun(x,t1,Fix(f,Tfun(t2,t),Fun(x2,t2, e1)),e2)*)
+  (*seq and setf*)
   | e1=expression DOT x=IDENT BARROW e2=expression {SetF(e1,x,e2)}
   | e1=expression PV e2=expression {Seq(e1,e2)}
+  (*uop and bop*)
+  | e1=expression op=binop e2=expression { Bop(op, e1, e2) }
+  | up=unop e=expression {Uop(up,e)}
+  (*if then else*)
+  | IF ef=expression THEN et=expression {If(ef,et,Unit)}
+  | IF ef=expression THEN et=expression ELSE el=expression {If(ef,et,el)}
+  (*App fun *)
+  | e=expression se=simple_expression { App(e,se)}
+  | FUN x=IDENT ARROW e=expression {Fun(x, Option, e)}
+  (*let et rec*)
+  | LET f=IDENT  param=param EQ e1=expression IN e2=expression  {Let(f,param e1,e2)} (*let f (x1:t1) (x2:t2) = e1 in e2   devient Let(f,Fun(x1,t1,Fun(x2,t2,e1)),e2)*)
+  | LET REC f=IDENT arg=param DP t=IDENT EQ e1=expression IN e2=expression {Let(f,paramRec t e1,e2)} (* let rec f (x1:t1) (x2:t2) : t = e1 in e2 devient Let(f,Fix(f,Tfun(t1,t),Fun(x,t1,Fix(f,Tfun(t2,t),Fun(x2,t2, e1)),e2)*)
+
 
    
 (*typ not string for the second argument of fun and fix *)

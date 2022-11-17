@@ -45,27 +45,30 @@ let eval_prog (p: prog): value =
 
     | Var x ->  Map.find env x
     | GetF(e,x) -> Hashtbl.find (eval e) x
+    
+    (*if then eslse*)
+    | If(ef,et,el) -> if (eval ef env ) then (eval et env) else (eval el env)
 
 
     | Bop(Add, e1, e2) -> VInt ((evali e1 env) + (evali e2 env))
     | Bop(Mul, e1, e2) -> VInt ((evali e1 env) * (evali e2 env))
     | Bop(Sub, e1, e2) -> VInt ((evali e1 env) - (evali e2 env))
     | Bop(Div, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
-    | Bop(Mod, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
+    | Bop(Mod, e1, e2) -> VInt ((evali e1 env) mod (evali e2 env))
 
-    | Bop(Eq, e1, e2) -> VBool ((evali e1 env) = (evali e2 env))
-    | Bop(Lt, e1, e2) -> VBool ((evali e1 env) < (evali e2 env))
-    | Bop(Gt, e1, e2) -> VBool ((evali e1 env) > (evali e2 env))
-    | Bop(Le, e1, e2) -> VBool ((evali e1 env) <= (evali e2 env))
-    | Bop(Ge, e1, e2) -> VBool ((evali e1 env) >= (evali e2 env))
-    | Bop(And, e1, e2) -> VBool ((evali e1 env) && (evali e2 env))
-    | Bop(Or, e1, e2) -> VBool ((evali e1 env) || (evali e2 env))
-    | Bop(Neq, e1, e2) -> VBool ((evali e1 env) != (evali e2 env))
+    | Bop(Eq, e1, e2) -> VBool ((evalb e1 env) == (evalb e2 env))
+    | Bop(Lt, e1, e2) -> VBool ((evalb e1 env) < (evalb e2 env))
+    | Bop(Gt, e1, e2) -> VBool ((evalb e1 env) > (evalb e2 env))
+    | Bop(Le, e1, e2) -> VBool ((evalb e1 env) <= (evalb e2 env))
+    | Bop(Ge, e1, e2) -> VBool ((evalb e1 env) >= (evalb e2 env))
+    | Bop(And, e1, e2) -> VBool ((evalb e1 env) && (evalb e2 env))
+    | Bop(Or, e1, e2) -> VBool ((evalb e1 env) || (evalb e2 env))
+    | Bop(Neq, e1, e2) -> VBool ((evalb e1 env) != (evalb e2 env))
 
 
-    | Uop(Neg, n) -> VInt (-n)
-    | Uop(Not, n) -> VBool (not b)
-
+    | Uop(Neg, n) -> VInt (-(evali (e1) env))
+    | Uop(Not, b) -> VBool (not (evalb (b) env))
+    (*il reste : stct ; setf and seq ; app and fun ; let and rec*)
 
   (* Évaluation d'une expression dont la valeur est supposée entière *)
   and evali (e: expr) (env: value Env.t): int = 
