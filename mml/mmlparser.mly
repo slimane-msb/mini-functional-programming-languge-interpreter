@@ -12,7 +12,7 @@
 %token LPAR RPAR
 %token FUN ARROW LET REC IN IF THEN ELSE  
 %token DOT (* for sometype.attribute*)
-%token PV (* pour point virgule*)
+%token PV DP(* pour point virgule, deux points*)
 %token <int> CST
 %token <bool> BOOL 
 %token <unit> UNIT  (* for () *)
@@ -45,15 +45,23 @@ simple_expression:
   | id=IDENT            { Var(id) }
   | se=simple_expression DOT id=IDENT { GetF(se,id)}
   | id=IDENT EQ e=expression PV er=expression{ SetF(e,id,er)} (* je suis pas de l'ordre de e et er, id en tous cas doit etre au milieu*)
-  | LPAR e=e RPAR { expression e }
+  | LPAR e=expression RPAR { e } 
 ;
 
 expression:
   | e=simple_expression { e }
   | e1=expression op=binop e2=expression { Bop(op, e1, e2) }
   | up=unop e=expression {Uop(up,e)}
-  | 
+  | e=expression se=simple_expression { App(e,se)}
+  | IF ef=expression THEN et=expression {If(ef,et,Unit)}
+  | IF ef=expression THEN et=expression ELSE el=expression {IF(ef,et,el)}
+  | FUN x=IDENT ARROW e=expression {Fun(x, Unit, e)}
+  | LET f=IDENT LPAR x=IDENT DP t0=IDENT (*or? TYPE*) RPAR DP t1=IDENT EQ e1=expression IN e2=expression  {Let(f,Fun(x,t0,e1), e2)} (*si on a pleusieur par*)
+  | LET REC f=IDENT LPAR x=IDENT DP t0=IDENT (*or? TYPE*) RPAR DP t1=IDENT EQ e1=expression IN e2=expression {Let(f, Fix(f, TFun(t0, t1), Fun(x, t0, e1)), e2)} (*si on a pleusieur par*)
+
+
 ;
+
 
 %inline binop:
   | PLUS { Add }
