@@ -20,38 +20,62 @@ let digit = ['0'-'9']
 let number = digit+
 let alpha = ['a'-'z' 'A'-'Z']
 let ident = ['a'-'z' '_'] (alpha | '_' | digit)*
+let space = [' ' '\t' '\r']+
   
 rule token = parse
-  | ['\n']              { new_line lexbuf; token lexbuf }
-  | [' ' '\t' '\r']+    { token lexbuf }
-  | "(*"                { comment lexbuf; token lexbuf }
-  | number as n         { CST(int_of_string n) }
+  | ['\n']                      { new_line lexbuf; token lexbuf }
+  | space                       { token lexbuf }
+  | "(*"                        { comment lexbuf; token lexbuf }
+  | number as n                 { CST(int_of_string n) }
+  | ("true"|"false") as b       { BOOL(bool_of_string b) }
+  | "(" space ")"               { UNIT }
+  | ident as id                 { IDENT(id) }
 
-  | "+"                 { PLUS }
-  | "*"                 { STAR }
-  | "-"                 { SUB  } 
-  | "/"                 { DIV  }
-  | "mod"               { MOD  }
+  | "+"                         { PLUS }
+  | "*"                         { STAR }
+  | "-"                         { SUB  } 
+  | "/"                         { DIV  }
+  | "mod"                       { MOD  }
     
-  | "-"                 { NEG  }
-  | "not "              { NOT  }
+  | "-"                         { NEG  }
+  | "not "                      { NOT  }
     
-  | "="                 { EQ   }
+  | "="                         { EQ   }
     
-  | "=="                { EQEQ }
-  | "!="                { NEQ  }
-  | "<"                 { LT   }
-  | "<="                { LE   }
-  | ">"                 { GT   }
-  | ">="                { GE   }
-  | "&&"                { AND  }
-  | "||"                { OR   }
+  | "=="                        { EQEQ }
+  | "!="                        { NEQ  }
+  | "<"                         { LT   }
+  | "<="                        { LE   }
+  | ">"                         { GT   }
+  | ">="                        { GE   }
+  | "&&"                        { AND  }
+  | "||"                        { OR   }
+
+  | "("                         { LPAR  }
+  | ")"                         { RPAR  }
+  | "("                         { LBRAQ }
+  | "("                         { RBRAQ }
+
+  | "("                         { FUN }
+  | "("                         { LET }
+  | "("                         { REC }
+  | "("                         { IN  }
+  | "("                         { IF  }
+  | "("                         { THEN }
+  | "("                         { ELSE }
+
+  | "("                         { ARROW  }
+  | "("                         { BARROW }
+  | "("                         { DOT }
+  | "("                         { PV  }
+  | "("                         { DP  }
+
     (* END *)
-  | _                   { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
-  | eof                 { EOF }
+  | _                           { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
+  | eof                         { EOF }
 
 and comment = parse
-  | "*)"                { () }
-  | "(*"                { comment lexbuf; comment lexbuf }
-  | _                   { comment lexbuf }
-  | eof                 { raise (Lexing_error "unterminated comment") }
+  | "*)"                        { () }
+  | "(*"                        { comment lexbuf; comment lexbuf }
+  | _                           { comment lexbuf }
+  | eof                         { raise (Lexing_error "unterminated comment") }
