@@ -39,9 +39,18 @@ let eval_prog (p: prog): value =
   let rec eval (e: expr) (env: value Env.t): value = 
     match e with
     | Int n  -> VInt n
-    
+    | Bool b  -> VBool b
+    | Unit   -> VUnit
+    | Ptr n  -> VPtr n (* il faut le rajouter a mmlparser aussi Ptr come ref ...*)
+
+    | Var x ->  Map.find env x
+    | GetF(e,x) -> Hashtbl.find (eval e) x
+
+
     | Bop(Add, e1, e2) -> VInt (evali e1 env + evali e2 env)
     | Bop(Mul, e1, e2) -> VInt (evali e1 env * evali e2 env)
+    | Bop(Sub, e1, e2) -> VInt (evali e1 env - evali e2 env)
+    | Bop(Div, e1, e2) -> VInt (evali e1 env / evali e2 env)
 
   (* Évaluation d'une expression dont la valeur est supposée entière *)
   and evali (e: expr) (env: value Env.t): int = 
