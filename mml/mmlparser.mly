@@ -5,13 +5,20 @@
 
 %}
 
-%token PLUS STAR
+%token PLUS STAR MINUS DIV MOD 
+%token EQ NQ LT LE AND OR 
+%token LPAR RPAR
+%token FUN ARROW LET REC IN IF THEN ELSE  
 %token <int> CST
+%token <bool> BOOL 
+%token <unit> UNIT 
 %token <string> IDENT
 %token EOF
 
+
 %left PLUS
 %left STAR
+
 
 %start program
 %type <Mml.prog> program
