@@ -53,22 +53,22 @@ rule token = parse
 
   | "("                         { LPAR  }
   | ")"                         { RPAR  }
-  | "("                         { LBRAQ }
-  | "("                         { RBRAQ }
+  | "{"                         { LBRAQ }
+  | "}"                         { RBRAQ }
 
-  | "("                         { FUN }
-  | "("                         { LET }
-  | "("                         { REC }
-  | "("                         { IN  }
-  | "("                         { IF  }
-  | "("                         { THEN }
-  | "("                         { ELSE }
+  | "fun"                         { FUN }
+  | "let"                         { LET }
+  | "rec"                         { REC }
+  | "in"                         { IN  }
+  | "if"                         { IF  }
+  | "then"                         { THEN }
+  | "else"                         { ELSE }
 
-  | "("                         { ARROW  }
-  | "("                         { BARROW }
-  | "("                         { DOT }
-  | "("                         { PV  }
-  | "("                         { DP  }
+  | "->"                         { ARROW  }
+  | "<-"                         { BARROW }
+  | "."                         { DOT }
+  | ";"                         { PV  }
+  | ":"                         { DP  }
 
     (* END *)
   | _                           { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
