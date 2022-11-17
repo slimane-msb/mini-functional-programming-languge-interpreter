@@ -23,6 +23,10 @@
 %left STAR DIV (*ordre de la multiplication et division*)
 %right PV 
 %left EQEQ NQ LT GT LE GE  (* ordre des operator conditionnels*)
+%left OR
+%left AND 
+%left DOT
+
 
 %start program
 %type <Mml.prog> program
