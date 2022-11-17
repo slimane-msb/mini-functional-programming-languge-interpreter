@@ -59,7 +59,7 @@ expression:
   | IF ef=expression THEN et=expression ELSE el=expression {IF(ef,et,el)}
   | FUN x=IDENT ARROW e=expression {Fun(x, Option, e)}
   | LET f=IDENT  param=param EQ e1=expression IN e2=expression  {Let(f,Fun(x,t0,e1), e2)} (*si on a pleusieur par*)
-  | LET REC f=IDENT arg=param DP t1=IDENT EQ e1=expression IN e2=expression {Let(f,param,e2)} (*si on a pleusieur par*)
+  | LET REC f=IDENT arg=param DP t1=IDENT EQ e1=expression IN e2=expression {Let(f,param e1,e2)} (*si on a pleusieur par*)
   | e1=expression DOT x=IDENT BARROW e2=expression {SetF(e1,x,e2)}
   | e1=expression PV e2=expression {Seq(e1,e2)}
 
@@ -67,8 +67,8 @@ expression:
 ;
 
 param:
-  | LPAR x=IDENT DP t0=IDENT RPAR arg2=param { Fun(x,t0,param) }
-  | {Unit}
+  | LPAR x=IDENT DP t0=IDENT RPAR arg2=param e1=expression { Fun(x,t0,param e1) }
+  | e1 = expression {e1}
 
 
 %inline binop:
