@@ -47,10 +47,25 @@ let eval_prog (p: prog): value =
     | GetF(e,x) -> Hashtbl.find (eval e) x
 
 
-    | Bop(Add, e1, e2) -> VInt (evali e1 env + evali e2 env)
-    | Bop(Mul, e1, e2) -> VInt (evali e1 env * evali e2 env)
-    | Bop(Sub, e1, e2) -> VInt (evali e1 env - evali e2 env)
-    | Bop(Div, e1, e2) -> VInt (evali e1 env / evali e2 env)
+    | Bop(Add, e1, e2) -> VInt ((evali e1 env) + (evali e2 env))
+    | Bop(Mul, e1, e2) -> VInt ((evali e1 env) * (evali e2 env))
+    | Bop(Sub, e1, e2) -> VInt ((evali e1 env) - (evali e2 env))
+    | Bop(Div, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
+    | Bop(Mod, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
+
+    | Bop(Eq, e1, e2) -> VBool ((evali e1 env) = (evali e2 env))
+    | Bop(Lt, e1, e2) -> VBool ((evali e1 env) < (evali e2 env))
+    | Bop(Gt, e1, e2) -> VBool ((evali e1 env) > (evali e2 env))
+    | Bop(Le, e1, e2) -> VBool ((evali e1 env) <= (evali e2 env))
+    | Bop(Ge, e1, e2) -> VBool ((evali e1 env) >= (evali e2 env))
+    | Bop(And, e1, e2) -> VBool ((evali e1 env) && (evali e2 env))
+    | Bop(Or, e1, e2) -> VBool ((evali e1 env) || (evali e2 env))
+    | Bop(Neq, e1, e2) -> VBool ((evali e1 env) != (evali e2 env))
+
+
+    | Uop(Neg, n) -> VInt (-n)
+    | Uop(Not, n) -> VBool (not b)
+
 
   (* Évaluation d'une expression dont la valeur est supposée entière *)
   and evali (e: expr) (env: value Env.t): int = 
