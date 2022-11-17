@@ -26,19 +26,27 @@ rule token = parse
   | [' ' '\t' '\r']+    { token lexbuf }
   | "(*"                { comment lexbuf; token lexbuf }
   | number as n         { CST(int_of_string n) }
+
   | "+"                 { PLUS }
   | "*"                 { STAR }
-  | "-"                 { NEG  }
-  | "not "              { NOT  }
   | "-"                 { SUB  } 
   | "/"                 { DIV  }
   | "mod"               { MOD  }
+    
+  | "-"                 { NEG  }
+  | "not "              { NOT  }
+    
+  | "="                 { EQ   }
+    
   | "=="                { EQEQ }
   | "!="                { NEQ  }
   | "<"                 { LT   }
   | "<="                { LE   }
+  | ">"                 { GT   }
+  | ">="                { GE   }
   | "&&"                { AND  }
   | "||"                { OR   }
+    (* END *)
   | _                   { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
   | eof                 { EOF }
 
