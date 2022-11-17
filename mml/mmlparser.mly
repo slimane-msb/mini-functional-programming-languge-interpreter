@@ -57,7 +57,7 @@ expression:
   | e=expression se=simple_expression { App(e,se)}
   | IF ef=expression THEN et=expression {If(ef,et,Unit)}
   | IF ef=expression THEN et=expression ELSE el=expression {IF(ef,et,el)}
-  | FUN x=IDENT ARROW e=expression {Fun(x, Unit, e)}
+  | FUN x=IDENT ARROW e=expression {Fun(x, Option, e)}
   | LET f=IDENT LPAR x=IDENT DP t0=IDENT (*or? TYPE*) RPAR DP t1=IDENT EQ e1=expression IN e2=expression  {Let(f,Fun(x,t0,e1), e2)} (*si on a pleusieur par*)
   | LET REC f=IDENT LPAR x=IDENT DP t0=IDENT (*or? TYPE*) RPAR DP t1=IDENT EQ e1=expression IN e2=expression {Let(f, Fix(f, TFun(t0, t1), Fun(x, t0, e1)), e2)} (*si on a pleusieur par*)
   | e1=expression DOT x=IDENT BARROW e2=expression {SetF(e1,x,e2)}
