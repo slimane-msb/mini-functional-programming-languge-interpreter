@@ -22,29 +22,17 @@ let alpha = ['a'-'z' 'A'-'Z']
 let ident = ['a'-'z' '_'] (alpha | '_' | digit)*
   
 rule token = parse
-  | ['\n']
-      { new_line lexbuf; token lexbuf }
-  | [' ' '\t' '\r']+
-      { token lexbuf }
-  | "(*" 
-      { comment lexbuf; token lexbuf }
-  | number as n
-      { CST(int_of_string n) }
-  | "+"
-      { PLUS }
-  | "*"
-      { STAR }
-  | _
-      { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
-  | eof
-      { EOF }
+  | ['\n']              { new_line lexbuf; token lexbuf }
+  | [' ' '\t' '\r']+    { token lexbuf }
+  | "(*"                { comment lexbuf; token lexbuf }
+  | number as n         { CST(int_of_string n) }
+  | "+"                 { PLUS }
+  | "*"                 { STAR }
+  | _                   { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
+  | eof                 { EOF }
 
 and comment = parse
-  | "*)"
-      { () }
-  | "(*"
-      { comment lexbuf; comment lexbuf }
-  | _
-      { comment lexbuf }
-  | eof
-      { raise (Lexing_error "unterminated comment") }
+  | "*)"                { () }
+  | "(*"                { comment lexbuf; comment lexbuf }
+  | _                   { comment lexbuf }
+  | eof                 { raise (Lexing_error "unterminated comment") }
