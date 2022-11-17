@@ -39,6 +39,7 @@ let eval_prog (p: prog): value =
   let rec eval (e: expr) (env: value Env.t): value = 
     match e with
     | Int n  -> VInt n
+    
     | Bop(Add, e1, e2) -> VInt (evali e1 env + evali e2 env)
     | Bop(Mul, e1, e2) -> VInt (evali e1 env * evali e2 env)
 
@@ -47,6 +48,23 @@ let eval_prog (p: prog): value =
     match eval e env with
     | VInt n -> n
     | _ -> assert false
+  
+  and evalb (e: expr) (env: value Env.t): bool = 
+    match eval e env with
+    | VBool b -> b
+    | _ -> assert false
+
+  and evalu (e: expr) (env: value Env.t): unit = 
+    match eval e env with
+    | VUnit -> ()
+    | _ -> assert false
+
+
+  and evalp (e: expr) (env: value Env.t): int (*si avec ref, dans ce cas il faudera le rajouter aussi dans type value *) = 
+    match eval e env with
+    | VPtr p -> p
+    | _ -> assert false
+  
   in
 
   eval p.code Env.empty
