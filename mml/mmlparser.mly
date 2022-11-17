@@ -5,13 +5,15 @@
 
 %}
 
-%token PLUS STAR MINUS DIV MOD 
-%token EQ NQ LT LE AND OR 
+%token PLUS STAR MINUS DIV MOD (*+ * - / mod*)
+%token EQ NQ LT LE GE GT AND OR (* for equal notequal lessThan LessEqual ..  *)
 %token LPAR RPAR
 %token FUN ARROW LET REC IN IF THEN ELSE  
+%token DOT (* for sometype.attribute*)
+%token PV (* pour point virgule*)
 %token <int> CST
 %token <bool> BOOL 
-%token <unit> UNIT 
+%token <unit> UNIT  (* for () *)
 %token <string> IDENT
 %token EOF
 
