@@ -6,7 +6,8 @@
 %}
 
 %token PLUS STAR MINUS DIV MOD (*+ * - / mod*)
-%token EQ NQ LT LE GE GT AND OR (* for equal notequal lessThan LessEqual ..  *)
+%token EQ  (* for equal*)
+%token EQEQ NQ LT LE GE GT  AND OR (* for equalequal notequal lessThan LessEqual ..  *)
 %token LPAR RPAR
 %token FUN ARROW LET REC IN IF THEN ELSE  
 %token DOT (* for sometype.attribute*)
@@ -18,9 +19,10 @@
 %token EOF
 
 
-%left PLUS
-%left STAR
-
+%left PLUS MINUS (*ordre de l'addition et soustraction*)
+%left STAR DIV (*ordre de la multiplication et division*)
+%right PV 
+%left EQEQ NQ LT GT LE GE  (* ordre des operator conditionnels*)
 
 %start program
 %type <Mml.prog> program
