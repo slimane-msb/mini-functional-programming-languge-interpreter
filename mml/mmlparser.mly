@@ -9,8 +9,9 @@
 %token NEG NOT
 %token EQ  (* for equal*)
 %token EQEQ NQ LT LE GE GT  AND OR (* for equalequal notequal lessThan LessEqual ..  *)
-%token LPAR RPAR
-%token FUN ARROW LET REC IN IF THEN ELSE  
+%token LPAR RPAR LBRAQ RBRAQ
+%token FUN LET REC IN IF THEN ELSE  
+%token ARROW BARROW
 %token DOT (* for sometype.attribute*)
 %token PV DP(* pour point virgule, deux points*)
 %token <int> CST
@@ -43,8 +44,9 @@ simple_expression:
   | b=BOOL            { Bool(b) }
   | u=UNIT            { Unit }
   | id=IDENT            { Var(id) }
-  | se=simple_expression DOT id=IDENT { GetF(se,id)}
-  | id=IDENT EQ e=expression PV er=expression{ SetF(e,id,er)} (* je suis pas de l'ordre de e et er, id en tous cas doit etre au milieu*)
+  | e=simple_expression DOT x=IDENT { GetF(e,x)}
+  | LBRAQ x=IDENT EQ e=expression PV  e=simple_expression RBRAQ{ Strct (x,e)::LBRAQ e RBRAQ} 
+  | LBRAQ RBRAQ {[]} (* cas de base pour les strct*)
   | LPAR e=expression RPAR { e } 
 ;
 
@@ -58,6 +60,8 @@ expression:
   | FUN x=IDENT ARROW e=expression {Fun(x, Unit, e)}
   | LET f=IDENT LPAR x=IDENT DP t0=IDENT (*or? TYPE*) RPAR DP t1=IDENT EQ e1=expression IN e2=expression  {Let(f,Fun(x,t0,e1), e2)} (*si on a pleusieur par*)
   | LET REC f=IDENT LPAR x=IDENT DP t0=IDENT (*or? TYPE*) RPAR DP t1=IDENT EQ e1=expression IN e2=expression {Let(f, Fix(f, TFun(t0, t1), Fun(x, t0, e1)), e2)} (*si on a pleusieur par*)
+  | e1=expression DOT x=IDENT BARROW e2=expression {SetF(e1,x,e2)}
+  | e1=expression PV e2=expression {Seq(e1,e2)}
 
 
 ;
