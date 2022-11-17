@@ -36,7 +36,7 @@
 %%
 
 program:
-  | (* à compléter *) code=expression EOF { {types=[]; code} }
+  | code=expression EOF { {types=[]; code} } (* a completer la suite !*)
 ;
 
 simple_expression:
@@ -44,6 +44,7 @@ simple_expression:
   | b=BOOL            { Bool(b) }
   | u=UNIT            { Unit }
   | id=IDENT            { Var(id) }
+  | LPAR e=expression RPAR { e }
   | e=simple_expression DOT x=IDENT { GetF(e,x)}
   | LBRAQ x=IDENT EQ e=expression PV  e=simple_expression RBRAQ{ Strct (x,e)::LBRAQ e RBRAQ} 
   | LBRAQ RBRAQ {[]} (* cas de base pour les strct*)
@@ -63,6 +64,8 @@ expression:
   | e1=expression DOT x=IDENT BARROW e2=expression {SetF(e1,x,e2)}
   | e1=expression PV e2=expression {Seq(e1,e2)}
 
+   
+
 
 ;
 
@@ -80,6 +83,15 @@ paramRec:
   | STAR { Mul }
   | SUB  { Sub }
   | DIV  { Div }
+  | EG   { Eq  }
+  | LT   { Lt  }
+  | GT   { Gt  }
+  | MOD  { Mod }
+  | LE   { Le  }
+  | GE   { Ge  }
+  | NEG  { Neq }
+  | AND  { And }
+  | Or   { Or  }
 ;
 
 
