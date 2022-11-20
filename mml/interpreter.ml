@@ -79,8 +79,9 @@ let eval_prog (p: prog): value =
 
     | Uop(Neg, n) -> VInt (-(evali (e1) env))
     | Uop(Not, b) -> VBool (not (evalb (b) env))
+
     (* app and fun ; let and rec*)
-    | App(e,se) -> 
+    | App(e1,e2) -> ( appliquer e1 e2 ) 
 
   (* Évaluation d'une expression dont la valeur est supposée entière *)
   and evali (e: expr) (env: value Env.t): int = 
@@ -109,12 +110,12 @@ let eval_prog (p: prog): value =
     List.iter (fun (s, e) -> Hashtbl.add h s (eval e env)) lse; VStrct h
 
   and set_e2x_in_e1 e2 x e1 = 
-  (* une fois hashtbl h de la structure e1 recupee*)
+  (*todo : recuperer la hashtable de la structure et la metttre dans une var h *)
     Hashtbl.replace h e2 x 
 
 
   and get_x_from_e x e = 
-    (*une fois hashtbl h recupe*)
+    (*todo : recuperer la hashtable de la structure et la metttre dans une var h *)
     Hashtbl.find h x
 
   and is_unit e1 = 
@@ -131,10 +132,18 @@ let eval_prog (p: prog): value =
       | (VUnit, VUnit) -> true 
       | (VStrct s1, VStrct s2) -> (is_same_pointer s1 s2)
       | (VClos c1, VClos c2) -> (is_same_pointer c1 c2) (* peut etre une autre fontion is_same_pointer_clos c1 c2*)
-      | _ -> false 
+      | _ -> raise (Interpreter_error " type erreur :: e1 e2  are not of the same type  ") (* ou just assert  false *)
 
     and is_same_pointer s1 s2 = 
       (*to do *)
+      s1 = s2 (* je suis pas sur c'est plus compique que ca *)
+
+    and appliquer e1 e2 = 
+      let v2 = ( eval e2 env ) in  (* car evaluer e2 en premier*)
+      let v1 = (eval e1 env ) in 
+      match v1 with 
+        | VPtr p -> 
+        | _ -> raise (Interpreter_error " e1 is not an application ")
 
   
   in
