@@ -56,12 +56,12 @@ let eval_prog (p: prog): value =
     | Bop(Div, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
     | Bop(Mod, e1, e2) -> VInt ((evali e1 env) mod (evali e2 env))
 
-    | Bop(Eq, e1, e2) ->  VBool ((evalb e1 env) == (evalb e2 env))
-    | Bop(Lt, e1, e2) ->  VBool ((evalb e1 env) <  (evalb e2 env))
-    | Bop(Gt, e1, e2) ->  VBool ((evalb e1 env) >  (evalb e2 env))
-    | Bop(Le, e1, e2) ->  VBool ((evalb e1 env) <= (evalb e2 env))
-    | Bop(Ge, e1, e2) ->  VBool ((evalb e1 env) >= (evalb e2 env))
-    | Bop(Neq, e1, e2) -> VBool ((evalb e1 env) != (evalb e2 env))
+    | Bop(Eq, e1, e2) ->  VBool ((evali e1 env) = (evali e2 env))
+    | Bop(Lt, e1, e2) ->  VBool ((evali e1 env) <  (evali e2 env))
+    | Bop(Gt, e1, e2) ->  VBool ((evali e1 env) >  (evali e2 env))
+    | Bop(Le, e1, e2) ->  VBool ((evali e1 env) <= (evali e2 env))
+    | Bop(Ge, e1, e2) ->  VBool ((evali e1 env) >= (evali e2 env))
+    | Bop(Neq, e1, e2) -> VBool ((evali e1 env) <> (evali e2 env))
 
     | Bop(And, e1, e2) -> if (evalb e1 env) then  (evalb e2 env) else VBool(false)
     | Bop(Or, e1, e2) -> if (evalb e1 env) then VBool(true)  else (evalb e2 env) 
