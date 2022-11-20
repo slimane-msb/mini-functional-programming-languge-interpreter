@@ -47,7 +47,7 @@ simple_expression:
   | LPAR e=expression RPAR { e }
   | e=simple_expression DOT x=IDENT { GetF(e,x)}
   (*strct*)
-  | LBRAQ x=IDENT EQ e=expression PV  e=simple_expression RBRAQ{ Strct (x,e)::LBRAQ e RBRAQ} 
+  | LBRAQ x=IDENT EQ e=expression PV  e=simple_expression RBRAQ{ Strct ((x,e)::(LBRAQ e RBRAQ))} 
   | LBRAQ RBRAQ {[]} (* cas de base pour les strct*) 
 ;
 

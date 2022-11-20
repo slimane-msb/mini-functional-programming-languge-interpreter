@@ -11,6 +11,7 @@ type value =
   | VBool  of bool
   | VUnit
   | VPtr   of int
+
 (* Élements du tas *)
 type heap_value =
   | VClos  of string * expr * value Env.t
@@ -44,7 +45,14 @@ let eval_prog (p: prog): value =
     | Ptr n  -> VPtr n 
 
     | Var x ->  Map.find env x
-    | GetF(e,x) -> Hashtbl.find (eval e) x
+
+    (*structure*)
+    | Strct(lse) -> (new_struct lse) 
+    | SetF(e1,x,e2) -> (set_e2x_in_e1 e2 x e1) ; VUnit
+    | GetF(e,x) -> ( get_x_from_e x e) 
+
+    (* sequence *) 
+    | Seq(e1,e2)
     
     (*if then eslse*)
     | If(ef,et,el) -> if (eval ef env ) then (eval et env) else (eval el env)
@@ -91,6 +99,20 @@ let eval_prog (p: prog): value =
     match eval e env with
     | VPtr p -> p
     | _ -> assert false
+
+  and new_struct lse = 
+    let h = Hashtbl.create (List.length lse) in
+    List.iter (fun (s, e) -> Hashtbl.add h s (eval e)) lse; VStrct h
+
+  and set_e2x_in_e1 e2 x e1 = 
+  (* une fois hashtbl h de la structure e1 recupee*)
+    Hashtbl.replace h e2 x 
+
+
+  and get_x_from_e x e = 
+    (*une fois hashtbl h recupe*)
+    Hashtbl.find h x
+
   
   in
 
