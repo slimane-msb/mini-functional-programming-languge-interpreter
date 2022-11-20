@@ -6,56 +6,58 @@
   exception Lexing_error of string
 
   let keyword_or_ident =
-    let h = Hashtbl.create 17 in
+    let h = Hashtbl.create 50 in
     List.iter (fun (s, k) -> Hashtbl.add h s k)
       [
-      ( "+"    , PLUS );
-      ( "*"    , STAR );
-      ( "-"    , SUB  ); 
-      ( "/"    , DIV  );
-      ( "mod"  , MOD  );
+        ( "+"    , PLUS );
+        ( "*"    , STAR );
+        ( "-"    , SUB  ); 
+        ( "/"    , DIV  );
+        ( "mod"  , MOD  );
+          
+        ( "-"    , NEG  );
+        ( "not " , NOT  );
+          
+        ( "="    , EQ   );
+          
+        ( "=="   , EQEQ );
+        ( "!="   , NEQ  );
+        ( "<"    , LT   );
+        ( "<="   , LE   );
+        ( ">"    , GT   );
+        ( ">="   , GE   );
+        ( "&&"   , AND  );
+        ( "||"   , OR   );
+
+        ( "("    , LPAR  );
+        ( ")"    , RPAR  );
+        ( "{"    , LBRAQ );
+        ( "}"    , RBRAQ );
+
+        ( "fun"  , FUN );
+        ( "let"  , LET );
+        ( "rec"  , REC );
+        ( "in"   , IN  );
+        ( "if"   , IF  );
+        ( "then" , THEN );
+        ( "else" , ELSE );
+
+        ( "true" , BOOL((bool_of_string "true")) );
+        ( "false", BOOL((bool_of_string "false")) );
         
-      ( "-"    , NEG  );
-      ( "not " , NOT  );
-        
-      ( "="    , EQ   );
-        
-      ( "=="   , EQEQ );
-      ( "!="   , NEQ  );
-      ( "<"    , LT   );
-      ( "<="   , LE   );
-      ( ">"    , GT   );
-      ( ">="   , GE   );
-      ( "&&"   , AND  );
-      ( "||"   , OR   );
 
-      ( "("    , LPAR  );
-      ( ")"    , RPAR  );
-      ( "{"    , LBRAQ );
-      ( "}"    , RBRAQ );
-
-      ( "fun"  , FUN );
-      ( "let"  , LET );
-      ( "rec"  , REC );
-      ( "in"   , IN  );
-      ( "if"   , IF  );
-      ( "then" , THEN );
-      ( "else" , ELSE );
-
-      ( "true" , BOOL((bool_of_string "true")) );
-      ( "false", BOOL((bool_of_string "false")) );
-      
-
-      ( "->"   , ARROW  );
-      ( "<-"   , BARROW );
-      ( "."    , DOT );
-      ( ";"    , PV  );
-      ( ":"    , DP  );
+        ( "->"   , ARROW  );
+        ( "<-"   , BARROW );
+        ( "."    , DOT );
+        ( ";"    , PV  );
+        ( ":"    , DP  );
       ] ;
 
     fun s ->
       try  Hashtbl.find h s
       with Not_found -> IDENT(s)
+
+  let key_o_id = keyword_or_ident ; 
         
 }
 
@@ -73,52 +75,8 @@ rule token = parse
   | number as n                 { CST(int_of_string n) }
   | "(" space_opt ")"           { UNIT }
 
-  (* 
-  | ("true"|"false") as b       { BOOL(bool_of_string b) }
-
-  | "+"                         { PLUS }
-  | "*"                         { STAR }
-  | "-"                         { SUB  } 
-  | "/"                         { DIV  }
-  | "mod"                       { MOD  }
-    
-  | "-"                         { NEG  }
-  | "not "                      { NOT  }
-    
-  | "="                         { EQ   }
-    
-  | "=="                        { EQEQ }
-  | "!="                        { NEQ  }
-  | "<"                         { LT   }
-  | "<="                        { LE   }
-  | ">"                         { GT   }
-  | ">="                        { GE   }
-  | "&&"                        { AND  }
-  | "||"                        { OR   }
-
-  | "("                         { LPAR  }
-  | ")"                         { RPAR  }
-  | "{"                         { LBRAQ }
-  | "}"                         { RBRAQ }
-
-  | "fun"                       { FUN }
-  | "let"                       { LET }
-  | "rec"                       { REC }
-  | "in"                        { IN  }
-  | "if"                        { IF  }
-  | "then"                      { THEN }
-  | "else"                      { ELSE }
-
-  | "->"                        { ARROW  }
-  | "<-"                        { BARROW }
-  | "."                         { DOT }
-  | ";"                         { PV  }
-  | ":"                         { DP  }
-
-  | ident as id                 { IDENT(id) } *)
-
   (*id or keyword using hashtbl*)
-  | ident as id_or_key          { keyword_or_ident id_or_key }
+  | ident as id_or_key          { key_o_id id_or_key }  (* key_o_id pour ne pas creer la hashtbl a chaque fois || si ca marche pas faut just remplacer key_o_id par keyword_or_ident  *)
 
     (* END *)
   | _                           { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
