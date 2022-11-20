@@ -41,7 +41,7 @@ let eval_prog (p: prog): value =
     | Int n  -> VInt n
     | Bool b  -> VBool b
     | Unit   -> VUnit
-    | Ptr n  -> VPtr n (* il faut le rajouter a mmlparser aussi Ptr come ref ...*)
+    | Ptr n  -> VPtr n 
 
     | Var x ->  Map.find env x
     | GetF(e,x) -> Hashtbl.find (eval e) x
@@ -56,15 +56,15 @@ let eval_prog (p: prog): value =
     | Bop(Div, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
     | Bop(Mod, e1, e2) -> VInt ((evali e1 env) mod (evali e2 env))
 
-    | Bop(Eq, e1, e2) -> VBool ((evalb e1 env) == (evalb e2 env))
-    | Bop(Lt, e1, e2) -> VBool ((evalb e1 env) < (evalb e2 env))
-    | Bop(Gt, e1, e2) -> VBool ((evalb e1 env) > (evalb e2 env))
-    | Bop(Le, e1, e2) -> VBool ((evalb e1 env) <= (evalb e2 env))
-    | Bop(Ge, e1, e2) -> VBool ((evalb e1 env) >= (evalb e2 env))
-    | Bop(And, e1, e2) -> VBool ((evalb e1 env) && (evalb e2 env))
-    | Bop(Or, e1, e2) -> VBool ((evalb e1 env) || (evalb e2 env))
+    | Bop(Eq, e1, e2) ->  VBool ((evalb e1 env) == (evalb e2 env))
+    | Bop(Lt, e1, e2) ->  VBool ((evalb e1 env) <  (evalb e2 env))
+    | Bop(Gt, e1, e2) ->  VBool ((evalb e1 env) >  (evalb e2 env))
+    | Bop(Le, e1, e2) ->  VBool ((evalb e1 env) <= (evalb e2 env))
+    | Bop(Ge, e1, e2) ->  VBool ((evalb e1 env) >= (evalb e2 env))
     | Bop(Neq, e1, e2) -> VBool ((evalb e1 env) != (evalb e2 env))
 
+    | Bop(And, e1, e2) -> if (evalb e1 env) then  (evalb e2 env) else VBool(false)
+    | Bop(Or, e1, e2) -> if (evalb e1 env) then VBool(true)  else (evalb e2 env) 
 
     | Uop(Neg, n) -> VInt (-(evali (e1) env))
     | Uop(Not, b) -> VBool (not (evalb (b) env))
