@@ -2,6 +2,8 @@
 
 open Mml
 
+exception Interpreter_error of string 
+
 (* Environnement : associe des valeurs à des noms de variables *)
 module Env = Map.Make(String)
 
@@ -52,10 +54,10 @@ let eval_prog (p: prog): value =
     | GetF(e,x) -> ( get_x_from_e x e) 
 
     (* sequence *) 
-    | Seq(e1,e2)
+    | Seq(e1,e2) -> if (is_unit e1) then (eval e1 env) else raise (Interpreter_error "the first expression of this sequence should have type unit")
     
     (*if then eslse*)
-    | If(ef,et,el) -> if (eval ef env ) then (eval et env) else (eval el env)
+    | If(ef,et,el) -> if (evalb ef ) then (eval et env) else (eval el env)
 
 
     | Bop(Add, e1, e2) -> VInt ((evali e1 env) + (evali e2 env))
@@ -64,19 +66,21 @@ let eval_prog (p: prog): value =
     | Bop(Div, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
     | Bop(Mod, e1, e2) -> VInt ((evali e1 env) mod (evali e2 env))
 
-    | Bop(Eq, e1, e2) ->  VBool ((evali e1 env) = (evali e2 env))
     | Bop(Lt, e1, e2) ->  VBool ((evali e1 env) <  (evali e2 env))
     | Bop(Gt, e1, e2) ->  VBool ((evali e1 env) >  (evali e2 env))
     | Bop(Le, e1, e2) ->  VBool ((evali e1 env) <= (evali e2 env))
     | Bop(Ge, e1, e2) ->  VBool ((evali e1 env) >= (evali e2 env))
-    | Bop(Neq, e1, e2) -> VBool ((evali e1 env) <> (evali e2 env))
+
+    | Bop(Eq, e1, e2) ->  is_equal e1 e2    VBool ((evali e1 env) = (evali e2 env))
+    | Bop(Neq, e1, e2) -> not (is_equal e1 e2)   
 
     | Bop(And, e1, e2) -> if (evalb e1 env) then  (evalb e2 env) else VBool(false)
     | Bop(Or, e1, e2) -> if (evalb e1 env) then VBool(true)  else (evalb e2 env) 
 
     | Uop(Neg, n) -> VInt (-(evali (e1) env))
     | Uop(Not, b) -> VBool (not (evalb (b) env))
-    (*il reste : stct ; setf and seq ; app and fun ; let and rec*)
+    (* app and fun ; let and rec*)
+    | App(e,se) -> 
 
   (* Évaluation d'une expression dont la valeur est supposée entière *)
   and evali (e: expr) (env: value Env.t): int = 
@@ -102,7 +106,7 @@ let eval_prog (p: prog): value =
 
   and new_struct lse = 
     let h = Hashtbl.create (List.length lse) in
-    List.iter (fun (s, e) -> Hashtbl.add h s (eval e)) lse; VStrct h
+    List.iter (fun (s, e) -> Hashtbl.add h s (eval e env)) lse; VStrct h
 
   and set_e2x_in_e1 e2 x e1 = 
   (* une fois hashtbl h de la structure e1 recupee*)
@@ -112,6 +116,25 @@ let eval_prog (p: prog): value =
   and get_x_from_e x e = 
     (*une fois hashtbl h recupe*)
     Hashtbl.find h x
+
+  and is_unit e1 = 
+    match ( eval e1  env) with 
+    | VUnit -> true 
+    | _ -> false 
+
+  and is_equal e1 e2 = 
+    let v1 = eval e1 env in 
+    let v2 = eval e2 env in 
+    match (v1, v2) with 
+      | (VInt n1, VInt n2 ) -> (n1=n2)
+      | (VBool b1, VBool b2 ) -> (b1=b2)
+      | (VUnit, VUnit) -> true 
+      | (VStrct s1, VStrct s2) -> (is_same_pointer s1 s2)
+      | (VClos c1, VClos c2) -> (is_same_pointer c1 c2) (* peut etre une autre fontion is_same_pointer_clos c1 c2*)
+      | _ -> false 
+
+    and is_same_pointer s1 s2 = 
+      (*to do *)
 
   
   in
