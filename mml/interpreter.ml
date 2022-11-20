@@ -142,7 +142,7 @@ let eval_prog (p: prog): value =
       let v2 = ( eval e2 env ) in  (* car evaluer e2 en premier*)
       let v1 = (eval e1 env ) in 
       match v1 with 
-        | VPtr p -> 
+        | VPtr p -> let cle1 = !p in let e, v = (Map.find e2 cle1) in (eval e (Map.add v1 v2 env ) ) 
         | _ -> raise (Interpreter_error " e1 is not an application ")
 
   
