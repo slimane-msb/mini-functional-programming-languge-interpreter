@@ -1,0 +1,4 @@
+type t = {  a: int;  b: bool; }
+
+
+(let g = 2 in g)
