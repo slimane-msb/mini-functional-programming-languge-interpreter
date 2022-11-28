@@ -5,105 +5,122 @@
 
 %}
 
-%token PLUS STAR SUB DIV MOD (*+ * - / mod*)
-%token NEG NOT
-%token EQ  (* for equal*)
-%token EQEQ NEQ LT LE GE GT  AND OR (* for equalequal notequal lessThan LessEqual ..  *)
-%token LPAR RPAR LBRAQ RBRAQ
-%token FUN LET REC IN IF THEN ELSE  
-%token ARROW BARROW
-%token DOT (* for sometype.attribute*)
-%token PV DP(* pour point virgule, deux points*)
-%token <int> CST
-%token <bool> BOOL 
-%token <unit> UNIT  (* for () *)
-%token <string> IDENT
-%token EOF
+%token <int> CST  // constante
+%token <string> IDENT // identifiant
+%token <bool> BOOL // booléen
+%token UNIT // unit
+
+%token LPAR RPAR // parenthèses (  )
+%token LBRAC RBRAC // accolades { }
+
+%token SEMICOLON DOT COLON // ; . :
+
+%token LARROW RARROW  // flèche gauche et droite : <- ->
+
+/* arithmétique */
+%token PLUS STAR MINUS DIV MOD // opérateurs binaires arithmétiques : + * - / mod
+%token U_MINUS // opérateur unaire arithmétique  -  
+
+/* logique */
+%token TRUE FALSE // true false
+%token EQ // =
+%token EQEQ NEQ LE LT AND OR // opérateurs binaires logiques :  == != <= < && ||
+%token NOT // opérateur unaire logique : not
+%token IF THEN ELSE // if then else
+
+%token EOF // end of file
 
 
-%left PLUS MINUS (*ordre de l'addition et soustraction*)
-%left STAR DIV (*ordre de la multiplication et division*)
-%right PV 
-%left EQEQ NQ LT GT LE GE  (* ordre des operator conditionnels*)
-%left OR
-%left AND 
-%left DOT
+%token FUN LET REC IN TYPE  MUTABLE // fonctions
 
+
+%nonassoc THEN 
+%nonassoc IN ELSE RARROW LARROW
+%nonassoc SEMICOLON
+
+%left EQEQ NEQ LE LT AND OR
+%nonassoc FALSE TRUE 
+
+%left MINUS PLUS
+%left DIV STAR MOD
+
+%left LBRAC LPAR IDENT CST  
 
 %start program
 %type <Mml.prog> program
 
 %%
 
+/* TODO : Vérifier que quand y'a une liste que ça fonctionne bien
+Je ne suis pas sur que des trucs du genre list ( MUTABLE {m}  ,x = IDENT COLON etc ) { blabla } fonctionne comme on le pense
+*/
 program:
-  | code=expression EOF { {types=[]; code} } (* a completer la suite !*)
+|  lt = list( type_def ) code=expression EOF { {types = lt  ; code} }  // [<type_def>]* <expr> eof
+;
+
+type_def:
+| TYPE x = IDENT EQ LBRAC l = nonempty_list( m = option(MUTABLE) ;  x = IDENT ;  COLON;  t = typ ;  SEMICOLON {let b = m <> None in (x,t,b) } )
+RBRAC { x,l }  // type ident = { [[mutable]? ident : <type> ;]+ }
+;
+
+typ: 
+| CST { TInt } // int
+| BOOL { TBool  } // bool 
+| UNIT { TUnit } // unit 
+| x = IDENT { match x with | "int" -> TInt | "bool" -> TBool  | "unit" -> TUnit | _ -> TStrct x} // ident 
+| t1 = typ RARROW t2 = typ { TFun(t1,t2) } // <type> -> <type>
+| LPAR t = typ RPAR { t } // ( <type> )
 ;
 
 simple_expression:
-  | n=CST             { Int(n) }
-  | b=BOOL            { Bool(b) }
-  | u=UNIT            { Unit }
-  | id=IDENT            { Var(id) }
-  | LPAR e=expression RPAR { e }
-  | e=simple_expression DOT x=IDENT { GetF(e,x)}
-  (*strct*)
-  | LBRAQ x=IDENT EQ e=expression PV  e=simple_expression RBRAQ{ Strct ((x,e)::(LBRAQ e RBRAQ))} 
-  | LBRAQ RBRAQ {[]} (* cas de base pour les strct*) 
+| n=CST { Int(n) } // n
+| TRUE  { Bool(true) } // true
+| FALSE { Bool(false) } // false
+| LPAR RPAR { Unit } // ()
+| x = IDENT { Var(x) }  // ident
+| se = simple_expression DOT x = IDENT { GetF(se,x) } // <s_expr> . ident
+| LBRAC  l = nonempty_list( x = IDENT ; EQ ;  e = expression ; SEMICOLON { (x,e) } ) RBRAC {  Strct(l)  } // { [ident = <expr> ;]+ }
+| LPAR e = expression RPAR { e } // ( <expr> )
 ;
 
 expression:
-  | e=simple_expression { e }
-  (*seq and setf*)
-  | e1=expression DOT x=IDENT BARROW e2=expression {SetF(e1,x,e2)}
-  | e1=expression PV e2=expression {Seq(e1,e2)}
-  (*uop and bop*)
-  | e1=expression op=binop e2=expression { Bop(op, e1, e2) }
-  | up=unop e=expression {Uop(up,e)}
-  (*if then else*)
-  | IF ef=expression THEN et=expression {If(ef,et,Unit)}
-  | IF ef=expression THEN et=expression ELSE el=expression {If(ef,et,el)}
-  (*App fun *)
-  | e=expression se=simple_expression { App(e,se)}
-  | FUN x=IDENT ARROW e=expression {Fun(x, Option, e)}
-  (*let et rec*)
-  | LET f=IDENT  param=param EQ e1=expression IN e2=expression  {Let(f,param e1,e2)} (*let f (x1:t1) (x2:t2) = e1 in e2   devient Let(f,Fun(x1,t1,Fun(x2,t2,e1)),e2)*)
-  | LET REC f=IDENT arg=param DP t=IDENT EQ e1=expression IN e2=expression {Let(f,paramRec t e1,e2)} (* let rec f (x1:t1) (x2:t2) : t = e1 in e2 devient Let(f,Fix(f,Tfun(t1,t),Fun(x,t1,Fix(f,Tfun(t2,t),Fun(x2,t2, e1)),e2)*)
+| e=simple_expression { e } // <s_expr>
+| op = uop se = simple_expression  { Uop(op, se) }  // <uop> <s_expr>
+| e1=expression op=binop e2=expression { Bop(op, e1, e2) }  // <expr> <bop> <expr>
+| e =expression se = simple_expression { App (e, se) } // <expr> <s_expr>
 
+| IF c = expression THEN e = expression { If (c,e, Unit) }// if <expr> then <expr>
+| IF c = expression THEN e1 = expression ELSE e2 = expression { If (c,e1,e2) } // if <expr> then <expr> else <expr>
+| FUN LPAR x = IDENT COLON t = typ RPAR RARROW e = expression { Fun(x,t,e) }  // fun ident -> <expr>
 
-   
-(*typ not string for the second argument of fun and fix *)
+| LET x = IDENT l = list(LPAR; x = IDENT ; COLON  ; t = typ ; RPAR { (x,t) } ) 
+EQ e1 = expression IN e2 = expression { let fn = mk_fun l e1 in Let(x,fn,e2)} //  let ident [( ident : <type> )]* = <expr> in <expr>
+| LET REC x = IDENT l = list(LPAR ; x = IDENT ; COLON  ; t1 = typ ;  RPAR { (x,t1) }) COLON t2 = typ EQ e1 = expression IN e2 = expression
+{ let tfn = mk_fun_type l t2 in let fn = mk_fun l e1 in  Let(x,Fix(x,tfn,fn), e2 )} // let rec ident [( ident : <type> )]* : <type> = <expr> in <expr>
 
+| se  = simple_expression DOT x = IDENT LARROW e = expression  { SetF(se,x,e) } // <s_expr> . ident <- <expr>
+| e1 = expression SEMICOLON e2 = expression { Seq(e1,e2) } // <expr> ; <expr>
 ;
 
-param:
-  | LPAR x=IDENT DP t0=IDENT RPAR arg2=param e1=expression { Fun(x,t0,param e1) }
-  | e1 = expression {e1}
-
-paramRec:
-  | LPAR x=IDENT DP t0=IDENT RPAR arg2=param  t=IDENT e1=expression { Fix(f,Tfun(t1,t),Fun(x,t0,paramRec t e1)) }
-  | e1 = expression {e1}
 
 
 %inline binop:
-  | PLUS { Add }
-  | STAR { Mul }
-  | SUB  { Sub }
-  | DIV  { Div }
-  | EG   { Eq  }
-  | LT   { Lt  }
-  | GT   { Gt  }
-  | MOD  { Mod }
-  | LE   { Le  }
-  | GE   { Ge  }
-  | NEG  { Neq }
-  | AND  { And }
-  | Or   { Or  }
+| PLUS { Add }
+| STAR { Mul }
+| MINUS { Sub } 
+| DIV { Div }
+| MOD { Mod }
+| EQEQ { Eq }
+| NEQ { Neq }
+| LT { Lt }
+| LE { Le } 
+| AND { And } 
+| OR { Or } 
 ;
 
 
-%inline unop:
-  | NEG { Neg}
-  | NOT { Not }
+%inline   uop: 
+| MINUS { Neg } 
+| NOT { Not } 
 ;
-
 

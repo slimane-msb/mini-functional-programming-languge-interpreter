@@ -23,8 +23,43 @@ let type_prog prog =
   (* Calcule le type de l'expression [e] *)
   and type_expr e tenv = match e with
     | Int _  -> TInt
-    | Bop((Add | Mul), e1, e2) -> 
+    | Bool _ -> TBool
+    | Unit -> TUnit
+    | Var (x) -> SymTbl.find x tenv
+    | Bop((Add | Mul | Div | Sub | Mod ), e1, e2) -> 
        check e1 TInt tenv; check e2 TInt tenv; TInt
+    | Bop(( Neq | Lt | Le ), e1 ,e2 ) ->
+       check e1 TInt tenv; check e2 TInt tenv; TBool
+    | Bop((And | Or),e1,e2) -> 
+       check e1 TBool tenv; check e2 TBool tenv; TBool
+    | Bop(Eq, e1,e2) -> let t1 = type_expr e1 tenv in check e2 t1 tenv ; TBool
+    | Uop((Not), e) -> check e TBool tenv ; TBool
+    | Uop((Neg), e) -> check e TInt tenv ; TInt
+    | Let(x,e1,e2) ->  let t1 = type_expr e1 tenv in type_expr e2 (SymTbl.add x t1 tenv) 
+    | If (e1, e2 , e3) -> let t2 = type_expr e2 tenv in 
+                          let t3 =  type_expr e3 tenv  in
+                          check e1 TBool tenv ; 
+                          if (t3 = TUnit) then 
+                            (check e2 TUnit tenv; TUnit) 
+                          else 
+                            (check e2 t3 tenv  ; t2)   
+    | Fun (x,tx,e) -> let te = type_expr e (SymTbl.add x tx tenv) in TFun(tx,te)
+    | App(f, a) ->
+                  let tf = type_expr f tenv in
+                  let ta = type_expr a tenv in
+                  begin match tf with
+                    | TFun(tx, te) ->
+                      if tx = ta then
+                      te
+                      else
+                      error "Application" 
+                    | _ -> error "Need function"
+                  end
+    | Fix(x,tx,e) -> type_expr e (SymTbl.add x tx tenv)
+    (* | Strct l -> match l with [] ->   *)  
+    | GetF(e,x) -> check e (TStrct e) tenv; SymTbl.find x tenv 
+    | SetF(e1,x,e2) ->  check e (TStrct e) tenv; let t = type_expr x tenv in check e2 t tenv; TUnit 
+    | Seq (e1,e2) -> check e1 TUnit tenv ; type_expr e2 tenv (* on peut mettre t1 et pas TUnit et mettre avertissement si pas TUnit*)
 
   in
 

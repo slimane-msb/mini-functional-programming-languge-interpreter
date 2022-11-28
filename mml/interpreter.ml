@@ -2,8 +2,6 @@
 
 open Mml
 
-exception Interpreter_error of string 
-
 (* Environnement : associe des valeurs à des noms de variables *)
 module Env = Map.Make(String)
 
@@ -13,7 +11,6 @@ type value =
   | VBool  of bool
   | VUnit
   | VPtr   of int
-
 (* Élements du tas *)
 type heap_value =
   | VClos  of string * expr * value Env.t
@@ -42,110 +39,58 @@ let eval_prog (p: prog): value =
   let rec eval (e: expr) (env: value Env.t): value = 
     match e with
     | Int n  -> VInt n
-    | Bool b  -> VBool b
-    | Unit   -> VUnit
-    | Ptr n  -> VPtr n 
+    | Bool b -> VBool b 
+    | Var x -> Env.find x env
+    | Unit -> VUnit
+    | Bop(Add, e1, e2) -> VInt (evali e2 env + evali e1 env)
+    | Bop(Sub, e1, e2) -> VInt (evali e1 env - evali e2 env)
+    | Bop(Mul, e1, e2) -> VInt (evali e1 env * evali e2 env)
+    | Bop(Div , e1,e2) -> VInt (evali e1 env / evali e2 env) 
+    | Bop(Mod, e1,e2) -> VInt (evali e1 env mod evali e2 env) 
+    | Bop(And, e1,e2) -> VBool (evalb e1 env &&  evalb e2 env) 
+    | Bop(Or, e1,e2) -> VBool (evalb e1 env ||  evalb e2 env) 
+    | Bop(Eq, e1,e2) -> VBool (evalb e1 env ==  evalb e2 env) 
+    | Bop(Neq, e1,e2) -> VBool (evalb e1 env !=  evalb e2 env)
+    | Bop(Lt, e1,e2) -> VBool (evali e1 env < evali e2 env) 
+    | Bop(Le, e1,e2) -> VBool (evali e1 env <= evali e2 env) 
+    | Uop(Neg,e1) -> VInt (-(evali e1 env))
+    | Uop(Not, e1) -> VBool (not (evalb e1 env))
+    | Let (x,e1,e2) -> let v1 = eval e1 env in eval e2 (Env.add x v1 env) 
+    | Fun (x,tx,e) -> let v = new_ptr () in Hashtbl.add mem v (VClos(x,e,env)); VPtr v 
+    | App (e1,e2) -> begin match eval e1 env with
+                      | VPtr n -> let v2 = eval e2 env in 
+                                  let v = Hashtbl.find mem n in 
+                                  begin match v with VClos(x,b,env') -> eval b (Env.add x v2 env') | _ -> assert false end 
+                        
+                      | _ -> assert false 
+                      end
+    (* | Strct l -> let v = new_ptr () in  
+                  let rec add_strct l = begin match l with 
+                                    | [] ->  VPtr v  
+                                    |  (x,e) :: tl -> Hashtbl.add mem v (VStrct(x,eval e)); add_strct tl 
+                                  end in  add_strct l *)
 
-    | Var x ->  Map.find env x
-
-    (*structure*)
-    | Strct(lse) -> (new_struct lse) 
-    | SetF(e1,x,e2) -> (set_e2x_in_e1 e2 x e1) ; VUnit
-    | GetF(e,x) -> ( get_x_from_e x e) 
-
-    (* sequence *) 
-    | Seq(e1,e2) -> if (is_unit e1) then (eval e1 env) else raise (Interpreter_error "the first expression of this sequence should have type unit")
-    
-    (*if then eslse*)
-    | If(ef,et,el) -> if (evalb ef ) then (eval et env) else (eval el env)
-
-
-    | Bop(Add, e1, e2) -> VInt ((evali e1 env) + (evali e2 env))
-    | Bop(Mul, e1, e2) -> VInt ((evali e1 env) * (evali e2 env))
-    | Bop(Sub, e1, e2) -> VInt ((evali e1 env) - (evali e2 env))
-    | Bop(Div, e1, e2) -> VInt ((evali e1 env) / (evali e2 env))
-    | Bop(Mod, e1, e2) -> VInt ((evali e1 env) mod (evali e2 env))
-
-    | Bop(Lt, e1, e2) ->  VBool ((evali e1 env) <  (evali e2 env))
-    | Bop(Gt, e1, e2) ->  VBool ((evali e1 env) >  (evali e2 env))
-    | Bop(Le, e1, e2) ->  VBool ((evali e1 env) <= (evali e2 env))
-    | Bop(Ge, e1, e2) ->  VBool ((evali e1 env) >= (evali e2 env))
-
-    | Bop(Eq, e1, e2) ->  is_equal e1 e2    VBool ((evali e1 env) = (evali e2 env))
-    | Bop(Neq, e1, e2) -> not (is_equal e1 e2)   
-
-    | Bop(And, e1, e2) -> if (evalb e1 env) then  (evalb e2 env) else VBool(false)
-    | Bop(Or, e1, e2) -> if (evalb e1 env) then VBool(true)  else (evalb e2 env) 
-
-    | Uop(Neg, n) -> VInt (-(evali (e1) env))
-    | Uop(Not, b) -> VBool (not (evalb (b) env))
-
-    (* app and fun ; let and rec*)
-    | App(e1,e2) -> ( appliquer e1 e2 ) 
+    | GetF (e,x) ->begin match eval e env with 
+                    | VPtr n ->  let s = Hashtbl.find mem n in 
+                                begin match s with 
+                                VStrct(str,v) -> List.find (fun (x,y) -> x = str && v = y)  
+                                end
+                    end
+                                        
+    (* | Fix(x,tx,e) -> match eval e env with 
+                      | VPtr n -> let v =  Hashtbl.find mem n  *)
+    | _ -> assert false
 
   (* Évaluation d'une expression dont la valeur est supposée entière *)
   and evali (e: expr) (env: value Env.t): int = 
     match eval e env with
     | VInt n -> n
     | _ -> assert false
-  
+
   and evalb (e: expr) (env: value Env.t): bool = 
     match eval e env with
     | VBool b -> b
     | _ -> assert false
-
-  and evalu (e: expr) (env: value Env.t): unit = 
-    match eval e env with
-    | VUnit -> ()
-    | _ -> assert false
-
-
-  and evalp (e: expr) (env: value Env.t): int (*si avec ref, dans ce cas il faudera le rajouter aussi dans type value *) = 
-    match eval e env with
-    | VPtr p -> p
-    | _ -> assert false
-
-  and new_struct lse = 
-    let h = Hashtbl.create (List.length lse) in
-    List.iter (fun (s, e) -> Hashtbl.add h s (eval e env)) lse; VStrct h
-
-  and set_e2x_in_e1 e2 x e1 = 
-  (*todo : recuperer la hashtable de la structure et la metttre dans une var h *)
-    Hashtbl.replace h e2 x 
-
-
-  and get_x_from_e x e = 
-    (*todo : recuperer la hashtable de la structure et la metttre dans une var h *)
-    Hashtbl.find h x
-
-  and is_unit e1 = 
-    match ( eval e1  env) with 
-    | VUnit -> true 
-    | _ -> false 
-
-  and is_equal e1 e2 = 
-    let v1 = eval e1 env in 
-    let v2 = eval e2 env in 
-    match (v1, v2) with 
-      | (VInt n1, VInt n2 ) -> (n1=n2)
-      | (VBool b1, VBool b2 ) -> (b1=b2)
-      | (VUnit, VUnit) -> true 
-      | (VStrct s1, VStrct s2) -> (is_same_pointer s1 s2)
-      | (VClos c1, VClos c2) -> (is_same_pointer c1 c2) (* peut etre une autre fontion is_same_pointer_clos c1 c2*)
-      | _ -> raise (Interpreter_error " type erreur :: e1 e2  are not of the same type  ") (* ou just assert  false *)
-
-    and is_same_pointer s1 s2 = 
-      (*to do *)
-      s1 = s2 (* je suis pas sur c'est plus compique que ca *)
-
-    and appliquer e1 e2 = 
-      let v2 = ( eval e2 env ) in  (* car evaluer e2 en premier*)
-      let v1 = (eval e1 env ) in 
-      match v1 with 
-        | VPtr p -> let cle1 = !p in let e, v = (Map.find e2 cle1) in (eval e (Map.add v1 v2 env ) ) 
-        | _ -> raise (Interpreter_error " e1 is not an application ")
-
-  
   in
 
   eval p.code Env.empty

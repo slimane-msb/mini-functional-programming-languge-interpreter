@@ -1,4 +1,4 @@
-type intref = { mutable value: int; }
+type intref = { value: int; }
 
 let r = { value = 1; } in
 let rec fact (n:int) : unit =

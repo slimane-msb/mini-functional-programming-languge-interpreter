@@ -35,7 +35,6 @@ type expr =
   | GetF  of expr * string
   | SetF  of expr * string * expr
   | Seq   of expr * expr
-  (* rajouter fst snd pair *)
 
 type prog = {
     types: (string * strct) list;
