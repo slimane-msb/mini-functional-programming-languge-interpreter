@@ -70,13 +70,13 @@ let eval_prog (p: prog): value =
                                     |  (x,e) :: tl -> Hashtbl.add mem v (VStrct(x,eval e)); add_strct tl 
                                   end in  add_strct l *)
 
-    | GetF (e,x) ->begin match eval e env with 
+    (* | GetF (e,x) ->begin match eval e env with 
                     | VPtr n ->  let s = Hashtbl.find mem n in 
                                 begin match s with 
                                 VStrct(str,v) -> List.find (fun (x,y) -> x = str && v = y)  
                                 end
                     end
-                                        
+               *)                          
     (* | Fix(x,tx,e) -> match eval e env with 
                       | VPtr n -> let v =  Hashtbl.find mem n  *)
     | _ -> assert false

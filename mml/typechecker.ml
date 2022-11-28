@@ -55,10 +55,10 @@ let type_prog prog =
                       error "Application" 
                     | _ -> error "Need function"
                   end
-    | Fix(x,tx,e) -> type_expr e (SymTbl.add x tx tenv)
+   (*  | Fix(x,tx,e) -> type_expr e (SymTbl.add x tx tenv)
     (* | Strct l -> match l with [] ->   *)  
     | GetF(e,x) -> check e (TStrct e) tenv; SymTbl.find x tenv 
-    | SetF(e1,x,e2) ->  check e (TStrct e) tenv; let t = type_expr x tenv in check e2 t tenv; TUnit 
+    | SetF(e1,x,e2) ->  check e (TStrct e) tenv; let t = type_expr x tenv in check e2 t tenv; TUnit  *)
     | Seq (e1,e2) -> check e1 TUnit tenv ; type_expr e2 tenv (* on peut mettre t1 et pas TUnit et mettre avertissement si pas TUnit*)
 
   in
