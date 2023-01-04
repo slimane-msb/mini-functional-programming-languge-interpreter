@@ -68,7 +68,7 @@ program:
 type_def:
 | TYPE x = IDENT EQ LBRAC l = nonempty_list( m = option(MUTABLE) ;  x = IDENT ;  COLON;  t = typ ;  SEMICOLON {let b = m <> None in (x,t,b) } )
 RBRAC { x,l }  // type ident = { [[mutable]? ident : <type> ;]+ }
-;
+
 
 typ: 
 | CST { TInt } // int

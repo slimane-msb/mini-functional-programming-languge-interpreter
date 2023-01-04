@@ -1,1 +1,8 @@
- let rec f (x:int) : bool = x == 2 in f 2
+let sum (n :int) = 
+    let rec aux (acc :int) (n:int) : int = 
+    if n == 0 then acc 
+    else aux (acc + n) (n-1) 
+    in
+    aux 0 n
+in 
+sum 5

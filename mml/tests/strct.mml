@@ -1,5 +1,4 @@
-type t = { a: int;}
-type t2 = { s : t; b : bool; }
 
-let g = { a = 3;} in 
-let k = { s = g ; b = false; } in k
+type t2 = { s : int; b : bool; l : int; }
+
+let k = { s = 3 ; b = false; l = 7;} in k

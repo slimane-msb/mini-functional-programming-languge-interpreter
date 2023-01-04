@@ -24,7 +24,7 @@ let type_prog prog =
 
   and check_typ t1 t2  = if t1 <> t2 then type_error t1 t2
   
-  (* Vérifie qu'il existe un enregistrement dans prog.types qui a les mêmes types '*)
+  
   and check_fields types l tenv= 
         let search_struct strc = List.for_all2 (fun (str1,e) (str2,t,_) -> check e t tenv; str1 = str2) l strc in 
         match types with 
@@ -82,7 +82,7 @@ and check_get_fields types e x tenv =
                     begin match tf with
                     | TFun(tx, te) ->
                       check_typ tx ta; te
-                    | _ -> type_error tf (TFun (ta, ta)) (* TODO : Vérifier si la gestion d'erreur est bonne ici*)
+                    | _ -> type_error tf (TFun (ta, ta)) 
                   end
     | Fix(x,tx,e) -> let te = type_expr e (SymTbl.add x tx tenv) in 
                       check_typ tx te; te

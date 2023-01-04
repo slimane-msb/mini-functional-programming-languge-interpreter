@@ -24,12 +24,24 @@ let type_prog prog =
 
   and check_typ t1 t2  = if t1 <> t2 then type_error t1 t2
   
-  (* Vérifie qu'il existe un enregistrement dans prog.types qui a les mêmes types '*)
-  and check_fields types l tenv= 
-        let search_struct strc = List.for_all2 (fun (str1,e) (str2,t,_) -> check e t tenv; str1 = str2) l strc in 
+      (* implementation of this rule
+      s.x1 : t1     E |- e1 : t1     ...     s.xN : tN     E |- eN : tN
+      -----------------------------------------------------------------
+                    E |- { x1 = e1; ...; xN = eN; } : s
+
+                    *)
+      and check_fields types l tenv=
+        let search_struct strc = List.exists (fun (str1,t,_) -> str1 = strc) in 
         match types with 
         | [] -> error "Record not Found"
-        | hd :: types' -> if not (search_struct (snd hd)) then check_fields types' l tenv else TStrct(fst hd) 
+        | hd :: types' -> if not (search_struct (fst hd) l) then check_fields types' l tenv else 
+                          let strc = List.find (fun (str1,t,_) -> str1 = strc) l in 
+                          let _,t,_ = List.find (fun (str1,t,_) -> str1 = strc) (snd hd) in 
+                          check (snd strc) t tenv; 
+                          TStrct(fst hd)
+
+      
+        
       
 
   and check_set_fields types e1 x e2 tenv = 
@@ -82,7 +94,7 @@ and check_get_fields types e x tenv =
                     begin match tf with
                     | TFun(tx, te) ->
                       check_typ tx ta; te
-                    | _ -> type_error tf (TFun (ta, ta)) (* TODO : Vérifier si la gestion d'erreur est bonne ici*)
+                    | _ -> type_error tf (TFun (ta, ta)) 
                   end
     | Fix(x,tx,e) -> let te = type_expr e (SymTbl.add x tx tenv) in 
                       check_typ tx te; te
