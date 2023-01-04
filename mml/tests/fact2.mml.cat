@@ -1,4 +1,4 @@
-type intref = {  value: int; }
+type intref = { mutable  value: int; }
 
 
 (let r = { value = 1; } in

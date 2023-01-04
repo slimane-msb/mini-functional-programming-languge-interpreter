@@ -24,55 +24,25 @@ menhir --ocamlc '/home/mazino/.opam/4.08.1/bin/ocamlc.opt -bin-annot' --explain 
 # Target: mmllexer.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:mmllexer.cmo, file:mmllexer.ml, implem, ocaml, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o mmllexer.cmo mmllexer.ml # cached
 # Target: typechecker.ml.depends, tags: { bin_annot, explain, extension:ml, file:typechecker.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules typechecker.ml > typechecker.ml.depends
+/home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules typechecker.ml > typechecker.ml.depends # cached
 # Target: typechecker.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:typechecker.cmo, file:typechecker.ml, implem, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o typechecker.cmo typechecker.ml
-+ /home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o typechecker.cmo typechecker.ml
-File "typechecker.ml", line 24, characters 25-1856:
-24 | .........................match e with
-25 |     | Int _  -> TInt
-26 |     | Bool _ -> TBool
-27 |     | Unit -> TUnit
-28 |     | Var (x) -> SymTbl.find x tenv
-...
-59 |     (* | Strct l -> match l with [] ->   *)  
-60 |     | GetF(e,x) -> check e (TStrct e) tenv; SymTbl.find x tenv 
-61 |     | SetF(e1,x,e2) ->  check e (TStrct e) tenv; let t = type_expr x tenv in check e2 t tenv; TUnit  *)
-62 |     | Seq (e1,e2) -> check e1 TUnit tenv ; type_expr e2 tenv.........................................................................
-Warning 8: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-(Fix (_, _, _)|Strct _|GetF (_, _)|SetF (_, _, _))
+/home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o typechecker.cmo typechecker.ml # cached
 # Target: mmli.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:mmli.cmo, file:mmli.ml, implem, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o mmli.cmo mmli.ml
+/home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o mmli.cmo mmli.ml # cached
 # Target: mml.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:mml.cmx, file:mml.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mml.cmx mml.ml
-# Target: mmlparser.ml.depends, tags: { bin_annot, explain, extension:ml, file:mmlparser.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules mmlparser.ml > mmlparser.ml.depends
-# Target: mmlparser.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:mmlparser.cmx, file:mmlparser.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmlparser.cmx mmlparser.ml
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mml.cmx mml.ml # cached
 # Target: interpreter.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:interpreter.cmx, file:interpreter.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o interpreter.cmx interpreter.ml
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o interpreter.cmx interpreter.ml # cached
+# Target: mmlparser.ml.depends, tags: { bin_annot, explain, extension:ml, file:mmlparser.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules mmlparser.ml > mmlparser.ml.depends # cached
+# Target: mmlparser.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:mmlparser.cmx, file:mmlparser.ml, implem, native, ocaml, quiet, traverse, use_menhir }
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmlparser.cmx mmlparser.ml # cached
 # Target: mmllexer.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:mmllexer.cmx, file:mmllexer.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmllexer.cmx mmllexer.ml
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmllexer.cmx mmllexer.ml # cached
 # Target: typechecker.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:typechecker.cmx, file:typechecker.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o typechecker.cmx typechecker.ml
-+ /home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o typechecker.cmx typechecker.ml
-File "typechecker.ml", line 24, characters 25-1856:
-24 | .........................match e with
-25 |     | Int _  -> TInt
-26 |     | Bool _ -> TBool
-27 |     | Unit -> TUnit
-28 |     | Var (x) -> SymTbl.find x tenv
-...
-59 |     (* | Strct l -> match l with [] ->   *)  
-60 |     | GetF(e,x) -> check e (TStrct e) tenv; SymTbl.find x tenv 
-61 |     | SetF(e1,x,e2) ->  check e (TStrct e) tenv; let t = type_expr x tenv in check e2 t tenv; TUnit  *)
-62 |     | Seq (e1,e2) -> check e1 TUnit tenv ; type_expr e2 tenv.........................................................................
-Warning 8: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-(Fix (_, _, _)|Strct _|GetF (_, _)|SetF (_, _, _))
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o typechecker.cmx typechecker.ml # cached
 # Target: mmli.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:mmli.cmx, file:mmli.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmli.cmx mmli.ml
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmli.cmx mmli.ml # cached
 # Target: mmli.native, tags: { bin_annot, dont_link_with, explain, extension:native, file:mmli.native, link, native, ocaml, program, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt mml.cmx interpreter.cmx mmlparser.cmx mmllexer.cmx typechecker.cmx mmli.cmx -o mmli.native
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt mml.cmx interpreter.cmx mmlparser.cmx mmllexer.cmx typechecker.cmx mmli.cmx -o mmli.native # cached
 # Compilation successful.

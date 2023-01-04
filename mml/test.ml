@@ -1,9 +1,5 @@
-(* let (mem: (int, string) Hashtbl.t) = Hashtbl.create 16 ;; 
-  let new_ptr =
-    let cpt = ref 0 in
-    fun () -> incr cpt; !cpt
-  in
-;; *)
-
-module Env = Map.Make(String)
-
+let rec aux (acc :int) (n:int) : int = 
+    if n == 0 then acc 
+    else aux (acc + n) (n-1) 
+  ;;
+    aux 0 5

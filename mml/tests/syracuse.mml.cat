@@ -7,10 +7,9 @@ fun (s: sequence) -> (let max = { value = (s).start; } in
                      (let iter =
                      fix (iter: (int) -> unit) = fun (n: int) -> if (
                                                                  (max).value < n) then
-                                                                 (max).value <- n; 
-                                                                 if (not  ((s).stop n)) then
-                                                                 (iter ((s).next n)) else
-                                                                 () else () in
+                                                                 (max).value <- n else
+                                                                 (); 
+                     if (not  ((s).stop n)) then (iter ((s).next n)) else () in
                      (iter (s).start); (max).value)) in
 (let syracuse =
 fun (n: int) -> { start = n; next = fun (k: int) -> if ((k mod 2) == 0) then

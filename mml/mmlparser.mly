@@ -19,7 +19,7 @@
 
 /* arithmétique */
 %token PLUS STAR MINUS DIV MOD // opérateurs binaires arithmétiques : + * - / mod
-%token U_MINUS // opérateur unaire arithmétique  -  
+/* %token U_MINUS // opérateur unaire arithmétique  -   */
 
 /* logique */
 %token TRUE FALSE // true false
@@ -31,20 +31,27 @@
 %token EOF // end of file
 
 
-%token FUN LET REC IN TYPE  MUTABLE // fonctions
+%token FUN LET REC IN TYPE  MUTABLE // let rec in fun type mutable
 
 
-%nonassoc THEN 
-%nonassoc IN ELSE RARROW LARROW
-%nonassoc SEMICOLON
+  %nonassoc IN 
 
-%left EQEQ NEQ LE LT AND OR
-%nonassoc FALSE TRUE 
+  %nonassoc SEMICOLON
 
-%left MINUS PLUS
-%left DIV STAR MOD
+  %nonassoc THEN
+  %nonassoc LARROW
+  %nonassoc ELSE
 
-%left LBRAC LPAR IDENT CST  
+  %nonassoc RARROW
+
+
+  %nonassoc OR AND
+
+  %left EQEQ NEQ LE LT 
+  %left MINUS PLUS
+  %left DIV STAR MOD
+
+  %nonassoc LBRAC LPAR IDENT CST FALSE TRUE 
 
 %start program
 %type <Mml.prog> program

@@ -6,6 +6,8 @@ type tenv = typ SymTbl.t
 
 (* Pour remonter des erreurs circonstanciées *)
 exception Type_error of string
+
+let print_warning message = Printf.printf "Warning: %s" message
 let error s = raise (Type_error s)
 let type_error ty_actual ty_expected =
   error (Printf.sprintf "expected %s but got %s" 
@@ -20,6 +22,36 @@ let type_prog prog =
     let typ_e = type_expr e tenv in
     if typ_e <> typ then type_error typ_e typ
 
+  and check_typ t1 t2  = if t1 <> t2 then type_error t1 t2
+  
+  (* Vérifie qu'il existe un enregistrement dans prog.types qui a les mêmes types '*)
+  and check_fields types l tenv= 
+        let search_struct strc = List.for_all2 (fun (str1,e) (str2,t,_) -> check e t tenv; str1 = str2) l strc in 
+        match types with 
+        | [] -> error "Record not Found"
+        | hd :: types' -> if not (search_struct (snd hd)) then check_fields types' l tenv else TStrct(fst hd) 
+      
+
+  and check_set_fields types e1 x e2 tenv = 
+        let search_struct strc = List.exists (fun (str1,t,_) -> str1 = x) strc in 
+        match types with 
+        | [] -> error "Record not Found"
+        | hd :: types' -> if not (search_struct (snd hd)) then check_set_fields types' e1 x e2 tenv else 
+                          let _,t,m = List.find (fun (str1,t,_) -> str1 = x) (snd hd) in 
+                          check e1 (TStrct(fst hd)) tenv; 
+                          if not m then error "Field is not mutable";
+                          check e2 t tenv; 
+                          TUnit
+
+and check_get_fields types e x tenv = 
+        let search_struct strc = List.exists (fun (str1,t,_) -> str1 = x) strc in 
+        match types with 
+        | [] -> error "Record not Found"
+        | hd :: types' -> if not (search_struct (snd hd)) then check_get_fields types' e x tenv else 
+                          let _,t,_ = List.find (fun (str1,t,_) -> str1 = x) (snd hd) in 
+                          check e (TStrct(fst hd)) tenv; 
+                          t
+
   (* Calcule le type de l'expression [e] *)
   and type_expr e tenv = match e with
     | Int _  -> TInt
@@ -28,11 +60,11 @@ let type_prog prog =
     | Var (x) -> SymTbl.find x tenv
     | Bop((Add | Mul | Div | Sub | Mod ), e1, e2) -> 
        check e1 TInt tenv; check e2 TInt tenv; TInt
-    | Bop(( Neq | Lt | Le ), e1 ,e2 ) ->
+    | Bop(( Lt | Le ), e1 ,e2 ) ->
        check e1 TInt tenv; check e2 TInt tenv; TBool
     | Bop((And | Or),e1,e2) -> 
        check e1 TBool tenv; check e2 TBool tenv; TBool
-    | Bop(Eq, e1,e2) -> let t1 = type_expr e1 tenv in check e2 t1 tenv ; TBool
+    | Bop((Eq | Neq), e1,e2) -> let t1 = type_expr e1 tenv in check e2 t1 tenv ; TBool
     | Uop((Not), e) -> check e TBool tenv ; TBool
     | Uop((Neg), e) -> check e TInt tenv ; TInt
     | Let(x,e1,e2) ->  let t1 = type_expr e1 tenv in type_expr e2 (SymTbl.add x t1 tenv) 
@@ -47,20 +79,21 @@ let type_prog prog =
     | App(f, a) ->
                   let tf = type_expr f tenv in
                   let ta = type_expr a tenv in
-                  begin match tf with
+                    begin match tf with
                     | TFun(tx, te) ->
-                      if tx = ta then
-                      te
-                      else
-                      error "Application" 
-                    | _ -> error "Need function"
+                      check_typ tx ta; te
+                    | _ -> type_error tf (TFun (ta, ta)) (* TODO : Vérifier si la gestion d'erreur est bonne ici*)
                   end
-   (*  | Fix(x,tx,e) -> type_expr e (SymTbl.add x tx tenv)
-    (* | Strct l -> match l with [] ->   *)  
-    | GetF(e,x) -> check e (TStrct e) tenv; SymTbl.find x tenv 
-    | SetF(e1,x,e2) ->  check e (TStrct e) tenv; let t = type_expr x tenv in check e2 t tenv; TUnit  *)
-    | Seq (e1,e2) -> check e1 TUnit tenv ; type_expr e2 tenv (* on peut mettre t1 et pas TUnit et mettre avertissement si pas TUnit*)
-
+    | Fix(x,tx,e) -> let te = type_expr e (SymTbl.add x tx tenv) in 
+                      check_typ tx te; te
+    | Seq (e1, e2) -> let typ_e1 = type_expr e1 tenv in
+                      if typ_e1 <> TUnit then
+                        print_warning "expression doit être de type TUnit";
+                      let typ_e2 = type_expr e2 tenv in
+                        typ_e2
+    | Strct l ->  check_fields prog.types l tenv
+    | GetF(e,x) -> check_get_fields prog.types e x tenv
+    | SetF(e1,x,e2) -> check_set_fields prog.types e1 x e2 tenv
   in
 
   type_expr prog.code SymTbl.empty

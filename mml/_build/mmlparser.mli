@@ -2,7 +2,6 @@
 (* The type of tokens. *)
 
 type token = 
-  | U_MINUS
   | UNIT
   | TYPE
   | TRUE
