@@ -44,6 +44,10 @@ let () =
      report (lexeme_start_p lb, lexeme_end_p lb);
      eprintf "syntax error@.";
      exit 1
+  | Exception.Expecting    s-> 
+      report (lexeme_start_p lb, lexeme_end_p lb);
+      eprintf "%s@." s;
+      exit 1
   | e ->
      eprintf "Anomaly: %s\n@." (Printexc.to_string e);
      exit 2

@@ -14,7 +14,7 @@ let rec typ_to_string = function
   | TUnit -> "unit"
   | TFun(typ1, typ2) -> 
      Printf.sprintf "(%s) -> %s" (typ_to_string typ1) (typ_to_string typ2)
-  | TStrct s -> s
+  | TStrct s -> s 
 
 type uop = Neg | Not
 type bop = Add | Sub | Mul | Div | Mod | Eq | Neq | Lt | Le | And | Or

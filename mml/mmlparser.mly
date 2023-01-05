@@ -3,6 +3,8 @@
   open Lexing
   open Mml
 
+  open Exception
+
 %}
 
 %token <int> CST  // constante
@@ -12,8 +14,8 @@
 
 %token LPAR RPAR // parenthèses (  )
 %token LBRAC RBRAC // accolades { }
-
-%token SEMICOLON DOT COLON // ; . :
+%token SEMICOLON  DOT  COLON
+  
 
 %token LARROW RARROW  // flèche gauche et droite : <- ->
 
@@ -34,41 +36,50 @@
 %token FUN LET REC IN TYPE  MUTABLE // let rec in fun type mutable
 
 
-  %nonassoc IN 
+%nonassoc IN 
 
-  %nonassoc SEMICOLON
+%nonassoc SEMICOLON
 
-  %nonassoc THEN
-  %nonassoc LARROW
-  %nonassoc ELSE
+%nonassoc THEN
+%nonassoc LARROW
+%nonassoc ELSE
 
-  %nonassoc RARROW
+%nonassoc RARROW
 
 
-  %nonassoc OR AND
+%nonassoc OR AND
 
-  %left EQEQ NEQ LE LT 
-  %left MINUS PLUS
-  %left DIV STAR MOD
+%left EQEQ NEQ LE LT 
+%left MINUS PLUS
+%left DIV STAR MOD
 
-  %nonassoc LBRAC LPAR IDENT CST FALSE TRUE 
+%nonassoc LBRAC LPAR IDENT CST FALSE TRUE 
+
 
 %start program
 %type <Mml.prog> program
+
 
 %%
 
 /* TODO : Vérifier que quand y'a une liste que ça fonctionne bien
 Je ne suis pas sur que des trucs du genre list ( MUTABLE {m}  ,x = IDENT COLON etc ) { blabla } fonctionne comme on le pense
 */
+
+
+
+
+
 program:
 |  lt = list( type_def ) code=expression EOF { {types = lt  ; code} }  // [<type_def>]* <expr> eof
 ;
 
-type_def:
-| TYPE x = IDENT EQ LBRAC l = nonempty_list( m = option(MUTABLE) ;  x = IDENT ;  COLON;  t = typ ;  SEMICOLON {let b = m <> None in (x,t,b) } )
-RBRAC { x,l }  // type ident = { [[mutable]? ident : <type> ;]+ }
 
+type_def: 
+| TYPE x = IDENT EQ LBRAC l = nonempty_list( m = option(MUTABLE) ;  x = IDENT ;  COLON;  t = typ ; SEMICOLON {let b = m <> None in (x,t,b) })
+RBRAC { x,l }  // type ident = { [[mutable]? ident : <type> ;]+ }
+| TYPE error { expecting "identifier" }
+;
 
 typ: 
 | CST { TInt } // int
@@ -76,7 +87,7 @@ typ:
 | UNIT { TUnit } // unit 
 | x = IDENT { match x with | "int" -> TInt | "bool" -> TBool  | "unit" -> TUnit | _ -> TStrct x} // ident 
 | t1 = typ RARROW t2 = typ { TFun(t1,t2) } // <type> -> <type>
-| LPAR t = typ RPAR { t } // ( <type> )
+| LPAR t = typ RPAR { t }  // ( <type> )
 ;
 
 simple_expression:
@@ -87,7 +98,9 @@ simple_expression:
 | x = IDENT { Var(x) }  // ident
 | se = simple_expression DOT x = IDENT { GetF(se,x) } // <s_expr> . ident
 | LBRAC  l = nonempty_list( x = IDENT ; EQ ;  e = expression ; SEMICOLON { (x,e) } ) RBRAC {  Strct(l)  } // { [ident = <expr> ;]+ }
+
 | LPAR e = expression RPAR { e } // ( <expr> )
+| LPAR e = expression error { unclosed "parenthesis" } // ( <expr> )
 ;
 
 expression:
@@ -102,6 +115,8 @@ expression:
 
 | LET x = IDENT l = list(LPAR; x = IDENT ; COLON  ; t = typ ; RPAR { (x,t) } ) 
 EQ e1 = expression IN e2 = expression { let fn = mk_fun l e1 in Let(x,fn,e2)} //  let ident [( ident : <type> )]* = <expr> in <expr>
+| LET error { expecting "identifier" }
+
 | LET REC x = IDENT l = list(LPAR ; x = IDENT ; COLON  ; t1 = typ ;  RPAR { (x,t1) }) COLON t2 = typ EQ e1 = expression IN e2 = expression
 { let tfn = mk_fun_type l t2 in let fn = mk_fun l e1 in  Let(x,Fix(x,tfn,fn), e2 )} // let rec ident [( ident : <type> )]* : <type> = <expr> in <expr>
 

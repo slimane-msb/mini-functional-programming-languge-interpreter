@@ -1,1 +1,1 @@
-mmlcat.ml: Arg Filename Format Lexing Mmllexer Mmlparser Mmlpp Printexc
+mmlcat.ml: Arg Exception Filename Format Lexing Mmllexer Mmlparser Mmlpp Printexc
