@@ -2,4 +2,4 @@ type t1 = {a : int;}
 type t2 = { s : t1; b : bool; l : int;}
 
 let g = {a = 3;} in 
-let k = { s = g ; b = false; l = 7;} in k.l
+let k = { s = g ; b = false; l = 7;} in k.s.a
