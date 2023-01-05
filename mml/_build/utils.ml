@@ -1,4 +1,7 @@
-let min_dist = ref 2 (* minimum distance between two words *)
+(* global variable minimum distance between two words *)
+let min_dist = ref 2
+
+(* global variable for the word with the minimum distance *)
 let levenshtein_distance s1 s2 =
     let len1 = String.length s1 in
     let len2 = String.length s2 in

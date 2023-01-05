@@ -31,8 +31,8 @@ let type_prog prog =
     let search_struct strc =
       List.for_all2
         (fun (str1, e) (str2, t, _) ->
-          check e t tenv;
-          str1 = str2)
+          if (str1 = str2) then  (check e t tenv;true) else false 
+          )
         l strc
     in
     match types with
