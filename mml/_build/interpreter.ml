@@ -84,8 +84,7 @@ let eval_prog (p : prog) : value =
             let v1 = Hashtbl.find mem n1 in
             let v2 = Hashtbl.find mem n2 in
             match (v1, v2) with
-            | VClos (x1, e1, env1), VClos (x2, e2, env2) ->
-                VBool (x1 = x2 && e1 = e2 && env1 = env2)
+            | VClos (x1, e1, env1), VClos (x2, e2, env2) -> assert false
             | VStrct h1, VStrct h2 ->
                 let l1 = Hashtbl.fold (fun x v l -> (x, v) :: l) h1 [] in
                 let l2 = Hashtbl.fold (fun x v l -> (x, v) :: l) h2 [] in
@@ -273,6 +272,7 @@ let eval_prog (p : prog) : value =
           l;
         Hashtbl.add mem v (VStrct h);
         VPtr v
+
     | _ -> assert false
   in
 

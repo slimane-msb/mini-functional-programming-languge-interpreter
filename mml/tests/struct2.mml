@@ -1,0 +1,11 @@
+type s1 = {a : int ; next : bool;}
+type s2 = {a : int ; next : bool;}
+type ss4 = {h:bool ; f : int; mutable m : int;}
+type s3 = {b : int ; c : bool;}
+let ss1 = {a = 3; next = true;} in 
+let ss2 = {a = 4; next = true;} in 
+let ss3 = {b= 5 ; c=true;} in 
+let ss4 = {h=true ; f = 5; m = 3;} in 
+ss4.m <- 5;
+let ss5 = {h=true ; f=5 ; m=7;} in 
+ss4.m

@@ -1,0 +1,14 @@
+type intref = { mutable  value: int; }
+type sequence = {  start: int;  next: (int) -> int;  stop: (int) -> bool; }
+
+
+(let max_value =
+fun (s: sequence) -> (let max = { value = (s).start; } in
+                     (let iter =
+                     fix (iter: (int) -> unit) = fun (n: int) -> if (
+                                                                 (max).value < n) then
+                                                                 (max).value <- n else
+                                                                 (); 
+                     if (not  ((s).stop n)) then (iter ((s).next n)) else () in
+                     (iter (s).start); (max).value)) in
+(max_value (syracuse 27)))
