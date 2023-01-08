@@ -1,8 +1,3 @@
 
 
-(let sum =
-fun (n: int) -> (let aux =
-                fix (aux: (int) -> (int) -> int) = fun (acc: int) -> fun (n: int) -> 
-                if (n == 0) then acc else ((aux (acc + n)) (n - 1)) in
-                ((aux 0) n)) in
-(sum 5))
+(let arr = [ [ 2;  ]; [  ]; [ 2; 1; 2; 3; 21;  ];  ] in arr[2][4])

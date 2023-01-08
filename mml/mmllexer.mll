@@ -12,7 +12,9 @@
         "let", LET ; "rec", REC ;  "in",IN  ; 
         "if", IF  ;  "then",THEN  ; "else", ELSE ; "mod", MOD  ;
          "not" , NOT ; "type", TYPE ; 
-        (* "int", INT; "bool", BOOL  ;*) "unit", UNIT  ; "mutable", MUTABLE
+        (* "int", INT; "bool", BOOL  ;*) "unit", UNIT  ; "mutable", MUTABLE ; "while", WHILE  ; "do", DO ; 
+        "done", DONE ;
+        "ref" , REF  ;"new", NEW; "print" , PRINT
       ] ;
     fun s ->
       try  Hashtbl.find h s 
@@ -37,20 +39,29 @@ rule token = parse
   | "-" { MINUS }
   | "/" { DIV }
   | "=" { EQ }
+  | "<>" {NEQ}
   | ":" { COLON }
   | ";" { SEMICOLON }
   | "==" { EQEQ }
+  | "!=" { NEQEQ }
   | "<=" { LE }
   | "<" { LT }
+  | ">=" { GE }
+  | ">" { GT }
   | "&&" { AND }
   | "||" { OR }
   | "->" { RARROW }
   | "<-" { LARROW }
   | "." { DOT }
-  | "{" { LBRAC }
-  | "}" { RBRAC }
+  | "{" { LBRACES }
+  | "}" { RBRACES }
+  | "[" { LBRACKET }
+  | "]" { RBRACKET }
   | "(" { LPAR }
   | ")" { RPAR }
+  | "," { COMMA }
+  | "!" { DEREF }
+  | ":=" { ASSIGN } 
   | _ { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }
   | eof
       { EOF }

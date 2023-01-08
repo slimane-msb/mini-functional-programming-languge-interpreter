@@ -25,14 +25,12 @@ let type_prog prog =
     let typ_e = type_expr e tenv in
     if typ_e <> typ then type_error typ_e typ
   and check_typ t1 t2 = if t1 <> t2 then type_error t1 t2
-    
-  
   and check_fields types l tenv =
     let search_struct strc =
       List.for_all2
         (fun (str1, e) (str2, t, _) ->
-          if (str1 = str2) then  (check e t tenv;true) else false 
-          )
+          check e t tenv;
+          str1 = str2)
         l strc
     in
     match types with
@@ -72,7 +70,9 @@ let type_prog prog =
           if distance < !Utils.min_dist then
             if similar_id = "" then find_similar_id_aux x tenv' id
             else
-              let distance_similar_id = Utils.levenshtein_distance x similar_id in
+              let distance_similar_id =
+                Utils.levenshtein_distance x similar_id
+              in
               if distance < distance_similar_id then
                 find_similar_id_aux x tenv' id
               else find_similar_id_aux x tenv' similar_id
@@ -96,20 +96,26 @@ let type_prog prog =
           else
             raise
               (Type_error
-                 (Printf.sprintf "Undefined identifier: %s (Did you mean '%s'?)" x similar_id)))
+                 (Printf.sprintf "Undefined identifier: %s (Did you mean '%s'?)"
+                    x similar_id)))
     | Bop ((Add | Mul | Div | Sub | Mod), e1, e2) ->
         check e1 TInt tenv;
         check e2 TInt tenv;
         TInt
-    | Bop ((Lt | Le), e1, e2) ->
+    | Bop ((Lt | Le | Ge | Gt), e1, e2) ->
         check e1 TInt tenv;
         check e2 TInt tenv;
         TBool
     | Bop ((And | Or), e1, e2) ->
         check e1 TBool tenv;
         check e2 TBool tenv;
-        TBool
+        TBool (* égalité structurelle*)
     | Bop ((Eq | Neq), e1, e2) ->
+        let t1 = type_expr e1 tenv in
+        let t2 = type_expr e2 tenv in
+        check_typ t1 t2;
+        TBool
+    | Bop ((Eqeq | Neqeq), e1, e2) ->
         let t1 = type_expr e1 tenv in
         check e2 t1 tenv;
         TBool
@@ -156,6 +162,52 @@ let type_prog prog =
     | Strct l -> check_fields prog.types l tenv
     | GetF (e, x) -> check_get_fields prog.types e x tenv
     | SetF (e1, x, e2) -> check_set_fields prog.types e1 x e2 tenv
+    | While (e1, e2) ->
+        check e1 TBool tenv;
+        check e2 TUnit tenv;
+        TUnit
+    | Ref e ->
+        let t = type_expr e tenv in
+        TRef t
+    | Deref e -> (
+        let t = type_expr e tenv in
+        match t with TRef t' -> t' | _ -> type_error t (TRef t))
+    | Assign (e1, e2) ->
+        let t1 = type_expr e1 tenv in
+        let t2 = type_expr e2 tenv in
+        check_typ t1 (TRef t2);
+        TUnit
+    | Array l ->
+     (  match l with
+      | [] -> TArray TUnit
+      | e::l ->
+        let t = type_expr e tenv in
+        List.iter (fun e -> check_typ (type_expr e tenv) t ) l;
+        TArray t
+     ) 
+    | NewArray (e1, e2) -> (
+        let t1 = type_expr e1 tenv in
+        let t2 = type_expr e2 tenv in
+        match t1 with TInt -> TArray t2 | _ -> type_error t1 TInt)
+    | GetA (e1, e2) -> (
+        let t1 = type_expr e1 tenv in
+        let t2 = type_expr e2 tenv in
+        match t1 with
+        | TArray t ->
+            check_typ t2 TInt;
+            t
+        | _ -> type_error t1 (TArray t2))
+    | SetA (e1, e2, e3) -> (
+        let t1 = type_expr e1 tenv in
+        let t2 = type_expr e2 tenv in
+        let t3 = type_expr e3 tenv in
+        match t1 with
+        | TArray t ->
+            check_typ t2 TInt;
+            check_typ t t3;
+            TUnit
+        | _ -> type_error t1 (TArray t2))
+    | Print e -> TUnit
   in
 
   type_expr prog.code SymTbl.empty

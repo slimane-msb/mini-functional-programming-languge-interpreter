@@ -2,6 +2,7 @@
 (* The type of tokens. *)
 
 type token = 
+  | WHILE
   | UNIT
   | TYPE
   | TRUE
@@ -9,12 +10,17 @@ type token =
   | STAR
   | SEMICOLON
   | RPAR
+  | REF
   | REC
-  | RBRAC
+  | RBRACKET
+  | RBRACES
   | RARROW
+  | PRINT
   | PLUS
   | OR
   | NOT
+  | NEW
+  | NEQEQ
   | NEQ
   | MUTABLE
   | MOD
@@ -23,11 +29,14 @@ type token =
   | LPAR
   | LET
   | LE
-  | LBRAC
+  | LBRACKET
+  | LBRACES
   | LARROW
   | IN
   | IF
   | IDENT of (string)
+  | GT
+  | GE
   | FUN
   | FALSE
   | EQEQ
@@ -35,10 +44,15 @@ type token =
   | EOF
   | ELSE
   | DOT
+  | DONE
+  | DO
   | DIV
+  | DEREF
   | CST of (int)
+  | COMMA
   | COLON
   | BOOL of (bool)
+  | ASSIGN
   | AND
 
 (* This exception is raised by the monolithic API functions. *)
