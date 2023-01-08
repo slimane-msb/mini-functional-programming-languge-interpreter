@@ -59,7 +59,7 @@ rule token = parse
   | "]" { RBRACKET }
   | "(" { LPAR }
   | ")" { RPAR }
-  | "," { COMMA }
+  (* | "," { COMMA } *)
   | "!" { DEREF }
   | ":=" { ASSIGN } 
   | _ { raise (Lexing_error ("unknown character : " ^ (lexeme lexbuf))) }

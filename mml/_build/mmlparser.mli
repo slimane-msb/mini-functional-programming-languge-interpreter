@@ -49,7 +49,6 @@ type token =
   | DIV
   | DEREF
   | CST of (int)
-  | COMMA
   | COLON
   | BOOL of (bool)
   | ASSIGN

@@ -1,3 +1,4 @@
+
 type cool_list = {value : int ; next :cool_list;}
 let rec a_cool_list : cool_list = {
     value = 1;

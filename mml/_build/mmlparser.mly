@@ -44,7 +44,7 @@
 %token FUN LET REC IN TYPE  MUTABLE // let rec in fun type mutable
 
 
-%token COMMA // ,
+/* %token COMMA // , */
 
 
 
@@ -55,20 +55,19 @@
 
 
 %nonassoc THEN
-%right ELSE
+%nonassoc ELSE
 
 %nonassoc PRINT
 
 %nonassoc LARROW ASSIGN
-
 %nonassoc RARROW
-
 
 %nonassoc OR AND
 
-%left EQEQ NEQEQ EQ NEQ LE LT GE GT
+%right EQ NEQ EQEQ NEQEQ  LE LT GE GT
 %left MINUS PLUS
 %left DIV STAR MOD
+
 %nonassoc REF 
 %nonassoc DEREF
 %nonassoc DOT
@@ -118,15 +117,12 @@ simple_expression:
 | LBRACES  l = nonempty_list( x = IDENT ; EQ ;  e = expression ; SEMICOLON { (x,e) } ) RBRACES {  Strct(l)  } // { [ident = <expr> ;]+ }
 
 
-
-
-
 | REF se = simple_expression { Ref(se) } // ref <expr>
 | DEREF se = simple_expression { Deref(se) } // !<expr>
 
 
 | LPAR e = expression RPAR { e } // ( <expr> )
-| LPAR e = expression error { unclosed "parenthesis" } // ( <expr> )
+| LPAR e = expression error { unclosed "parenthesis" } // ( <expr> 
 
 ;
 
@@ -176,7 +172,7 @@ EQ e1 = expression IN e2 = expression { let fn = mk_fun l e1 in Let(x,fn,e2)} //
 | DIV { Div }
 | MOD { Mod }
 | EQ { Eq }
-| NEQ { Neq }
+| NEQ { Neq } 
 | EQEQ { Eqeq }
 | NEQEQ { Neqeq }
 | LT { Lt }

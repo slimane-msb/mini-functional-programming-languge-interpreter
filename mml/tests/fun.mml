@@ -1,2 +1,8 @@
-let arr = [[2;];[];[2;1;2;3;21;];] in 
-arr[2][4]
+let i = ref 0 in 
+let arr = [true;false;true;] in 
+while !i < 3 do 
+    print arr[!i];
+    i := !i+1
+done
+;
+arr[0]

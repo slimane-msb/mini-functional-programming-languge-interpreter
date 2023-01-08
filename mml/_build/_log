@@ -28,13 +28,13 @@ menhir --ocamlc '/home/mazino/.opam/4.08.1/bin/ocamlc.opt -bin-annot' --explain 
 # Target: mmllexer.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:mmllexer.cmo, file:mmllexer.ml, implem, ocaml, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o mmllexer.cmo mmllexer.ml # cached
 # Target: typechecker.ml.depends, tags: { bin_annot, explain, extension:ml, file:typechecker.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules typechecker.ml > typechecker.ml.depends
+/home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules typechecker.ml > typechecker.ml.depends # cached
 # Target: utils.ml.depends, tags: { bin_annot, explain, extension:ml, file:utils.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamldep.opt -modules utils.ml > utils.ml.depends # cached
 # Target: utils.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:utils.cmo, file:utils.ml, implem, ocaml, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o utils.cmo utils.ml # cached
 # Target: typechecker.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:typechecker.cmo, file:typechecker.ml, implem, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o typechecker.cmo typechecker.ml
+/home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o typechecker.cmo typechecker.ml # cached
 # Target: mmli.cmo, tags: { bin_annot, byte, compile, explain, extension:cmo, extension:ml, file:mmli.cmo, file:mmli.ml, implem, ocaml, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamlc.opt -c -bin-annot -o mmli.cmo mmli.ml # cached
 # Target: exception.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:exception.cmx, file:exception.ml, implem, native, ocaml, quiet, traverse, use_menhir }
@@ -52,9 +52,9 @@ menhir --ocamlc '/home/mazino/.opam/4.08.1/bin/ocamlc.opt -bin-annot' --explain 
 # Target: utils.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:utils.cmx, file:utils.ml, implem, native, ocaml, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o utils.cmx utils.ml # cached
 # Target: typechecker.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:typechecker.cmx, file:typechecker.ml, implem, native, ocaml, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o typechecker.cmx typechecker.ml
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o typechecker.cmx typechecker.ml # cached
 # Target: mmli.cmx, tags: { bin_annot, compile, explain, extension:cmx, extension:ml, file:mmli.cmx, file:mmli.ml, implem, native, ocaml, quiet, traverse, use_menhir }
 /home/mazino/.opam/4.08.1/bin/ocamlopt.opt -c -bin-annot -o mmli.cmx mmli.ml # cached
 # Target: mmli.native, tags: { bin_annot, dont_link_with, explain, extension:native, file:mmli.native, link, native, ocaml, program, quiet, traverse, use_menhir }
-/home/mazino/.opam/4.08.1/bin/ocamlopt.opt exception.cmx mml.cmx interpreter.cmx mmlparser.cmx mmllexer.cmx utils.cmx typechecker.cmx mmli.cmx -o mmli.native
+/home/mazino/.opam/4.08.1/bin/ocamlopt.opt exception.cmx mml.cmx interpreter.cmx mmlparser.cmx mmllexer.cmx utils.cmx typechecker.cmx mmli.cmx -o mmli.native # cached
 # Compilation successful.

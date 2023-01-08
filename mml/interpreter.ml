@@ -273,6 +273,7 @@ let eval_prog (p : prog) : value =
           l;
         Hashtbl.add mem v (VStrct h);
         VPtr v
+
     | _ -> assert false
   in
 
