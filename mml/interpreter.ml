@@ -1,6 +1,7 @@
 (* Interprète Mini-ML *)
 
 open Mml
+open Exception
 
 (* Environnement : associe des valeurs à des noms de variables *)
 module Env = Map.Make (String)
@@ -65,7 +66,7 @@ let eval_prog (p : prog) : value =
     match e with
     | Int n -> VInt n
     | Bool b -> VBool b
-    | Var x -> Env.find x env
+    | Var x -> (try Env.find x env with Not_found -> variable_not_found ())
     | Unit -> VUnit
     | Bop (Add, e1, e2) -> VInt (evali e1 env + evali e2 env)
     | Bop (Sub, e1, e2) -> VInt (evali e1 env - evali e2 env)
@@ -84,7 +85,8 @@ let eval_prog (p : prog) : value =
             let v1 = Hashtbl.find mem n1 in
             let v2 = Hashtbl.find mem n2 in
             match (v1, v2) with
-            | VClos (x1, e1, env1), VClos (x2, e2, env2) -> assert false
+            | VClos (x1, e1, env1), VClos (x2, e2, env2) ->
+                VBool (x1 = x2 && e1 = e2 && env1 = env2)
             | VStrct h1, VStrct h2 ->
                 let l1 = Hashtbl.fold (fun x v l -> (x, v) :: l) h1 [] in
                 let l2 = Hashtbl.fold (fun x v l -> (x, v) :: l) h2 [] in
@@ -228,7 +230,7 @@ let eval_prog (p : prog) : value =
                 match eval e2 env with
                 | VInt i -> (
                     try Hashtbl.find h i
-                    with Not_found -> failwith "out of bounds")
+                    with Not_found ->  out_of_bounds ())
                 | _ -> assert false)
             | _ -> assert false)
         | _ -> assert false)
@@ -272,7 +274,6 @@ let eval_prog (p : prog) : value =
           l;
         Hashtbl.add mem v (VStrct h);
         VPtr v
-
     | _ -> assert false
   in
 

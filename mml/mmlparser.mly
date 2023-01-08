@@ -171,7 +171,7 @@ EQ e1 = expression IN e2 = expression { let fn = mk_fun l e1 in Let(x,fn,e2)} //
 | MINUS { Sub } 
 | DIV { Div }
 | MOD { Mod }
-// | EQ { Eq } 
+/* | EQ { Eq } */
 | NEQ { Neq } 
 | EQEQ { Eqeq }
 | NEQEQ { Neqeq }

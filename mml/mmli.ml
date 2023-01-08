@@ -40,7 +40,11 @@ let () =
      report (lexeme_start_p lb, lexeme_end_p lb);
      eprintf "lexical error: %s@." s;
      exit 1
-  | Exception.Expecting    s-> 
+  | Exception.Expecting  s-> 
+      report (lexeme_start_p lb, lexeme_end_p lb);
+      eprintf "%s@." s;
+      exit 1
+   | Exception.OutOfBounds  s-> 
       report (lexeme_start_p lb, lexeme_end_p lb);
       eprintf "%s@." s;
       exit 1
