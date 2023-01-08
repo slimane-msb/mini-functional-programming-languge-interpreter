@@ -1,2 +1,2 @@
-let REF a = 3 in 
-DEREF a 
+let a = ref 3 in 
+!a 

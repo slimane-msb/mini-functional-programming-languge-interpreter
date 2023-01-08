@@ -1,4 +1,0 @@
-type cool_list = {a : int ; next : bool;}
-let c = {a = 3; next = true;} in 
-let d = {(a = 3); (next = true);} in 
-c = d
