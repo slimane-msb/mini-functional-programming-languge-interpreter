@@ -7,6 +7,7 @@ let usage = "usage: ./mmli file.mml"
 
 let spec = []
   
+
 let file =
     let file = ref None in
     let set_file s =
@@ -39,10 +40,19 @@ let () =
      report (lexeme_start_p lb, lexeme_end_p lb);
      eprintf "lexical error: %s@." s;
      exit 1
+  | Exception.Expecting  s-> 
+      report (lexeme_start_p lb, lexeme_end_p lb);
+      eprintf "%s@." s;
+      exit 1
+   | Exception.OutOfBounds  s-> 
+      report (lexeme_start_p lb, lexeme_end_p lb);
+      eprintf "%s@." s;
+      exit 1
   | Mmlparser.Error ->
      report (lexeme_start_p lb, lexeme_end_p lb);
      eprintf "syntax error@.";
      exit 1
+    
   | Typechecker.Type_error s ->
      eprintf "type error: %s@." s;
      exit 1

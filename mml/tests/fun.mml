@@ -1,3 +1,8 @@
-let f (x: int) (y: int) = x + y in
-let g = f 3 in
-g 1 + g 4
+let i = ref 0 in 
+let arr = [true;false;true;] in 
+while !i < 3 do 
+    print arr[!i];
+    i := !i+1
+done
+;
+arr[0]

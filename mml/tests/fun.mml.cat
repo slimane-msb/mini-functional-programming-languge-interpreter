@@ -1,0 +1,5 @@
+
+
+(let i = ref 0 in
+(let arr = [ true; false; true;  ] in
+while (!i < 3) do print arr[!i]; i := (!i + 1) done; arr[0]))
